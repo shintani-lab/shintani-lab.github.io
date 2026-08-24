@@ -1,7 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
+import Icon from '../components/Icon.astro';
 import { site, research, career } from '../lib/content';
+import { iconForField } from '../lib/icons';
 ---
 <Base
   title="Join Us"
@@ -21,7 +23,12 @@ import { site, research, career } from '../lib/content';
     <div class="container">
       <h2 class="section-title">身につく力<span class="en">What You Learn</span></h2>
       <ul class="skill-list">
-        {research.fields.map((f) => <li>{f}</li>)}
+        {research.fields.map((f) => (
+          <li>
+            <Icon name={iconForField(f)} size={22} />
+            <span>{f}</span>
+          </li>
+        ))}
       </ul>
       <p class="note skill-note">
         プログラミングや統計の経験は問いません。ことばや人の心に関心があり、
@@ -69,9 +76,11 @@ import { site, research, career } from '../lib/content';
     .skill-list, .career-list { grid-template-columns: repeat(3, 1fr); }
   }
   .skill-list li {
+    display: flex; align-items: center; gap: .8rem;
     background: var(--paper); border-left: 3px solid var(--teal-600);
     padding: .9rem 1.1rem; font-size: .92rem; font-weight: 500; color: var(--navy-900);
   }
+  .skill-list li :global(.icon) { color: var(--teal-600); }
   .career-list li {
     background: var(--tint); padding: .9rem 1.1rem;
     font-size: .92rem; font-weight: 500; color: var(--navy-900);

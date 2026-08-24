@@ -26,6 +26,7 @@ export type Site = {
   contact: { email_masked: string };
   catchcopy: { main: string };
   description: string;
+  graphic_words: string[];
 };
 
 export type Research = {

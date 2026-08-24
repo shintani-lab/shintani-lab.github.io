@@ -1,7 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import NewsList from '../components/NewsList.astro';
+import HeroGraphic from '../components/HeroGraphic.astro';
+import Icon from '../components/Icon.astro';
 import { site, research } from '../lib/content';
+import { iconForField } from '../lib/icons';
 import { getPublishedNews } from '../lib/news';
 
 // News は新しい順に3件だけ表示します。draft: true の記事は出しません。
@@ -12,23 +15,34 @@ const latestNews = allNews.slice(0, 3);
 // 区切りごとに span で囲むことで、「捉え、」のような語の途中で
 // 改行されるのを防いでいます（文言を変えてもそのまま働きます）。
 const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
+
+// 「研究のアプローチ」の各段階に出すアイコン。
+// 項目を増やした場合は丸印になります。
+const stepIcons: Record<number, string> = {
+  1: 'text', 2: 'code', 3: 'chart', 4: 'people',
+};
 ---
 <Base>
   <!-- ヒーロー -->
   <section class="hero">
     <div class="container hero-inner">
-      <p class="hero-id">
-        <span class="hero-univ">{site.professor.affiliation}</span>
-        <span class="hero-lab">{site.lab.name_ja}</span>
-        <span class="hero-en">{site.lab.name_en}</span>
-      </p>
-      <h1 class="hero-copy">
-        {catchcopyParts.map((part) => <span>{part}</span>)}
-      </h1>
-      <p class="hero-lead">{research.introduction[0]}</p>
-      <div class="hero-actions">
-        <a class="btn" href="/research/">研究内容を見る</a>
-        <a class="btn btn--ghost" href="/join/">配属を考えている方へ</a>
+      <div class="hero-text">
+        <p class="hero-id">
+          <span class="hero-univ">{site.professor.affiliation}</span>
+          <span class="hero-lab">{site.lab.name_ja}</span>
+          <span class="hero-en">{site.lab.name_en}</span>
+        </p>
+        <h1 class="hero-copy">
+          {catchcopyParts.map((part) => <span>{part}</span>)}
+        </h1>
+        <p class="hero-lead">{research.introduction[0]}</p>
+        <div class="hero-actions">
+          <a class="btn" href="/research/">研究内容を見る</a>
+          <a class="btn btn--ghost" href="/join/">配属を考えている方へ</a>
+        </div>
+      </div>
+      <div class="hero-figure">
+        <HeroGraphic />
       </div>
     </div>
   </section>
@@ -40,7 +54,12 @@ const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
       <ol class="approach">
         {research.approach.map((a) => (
           <li>
-            <span class="approach-num">{String(a.step).padStart(2, '0')}</span>
+            <div class="approach-head">
+              <span class="approach-icon">
+                <Icon name={stepIcons[a.step] ?? 'dot'} size={26} />
+              </span>
+              <span class="approach-num">{String(a.step).padStart(2, '0')}</span>
+            </div>
             <h3>{a.title}</h3>
             <p>{a.body}</p>
           </li>
@@ -54,7 +73,12 @@ const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
     <div class="container">
       <h2 class="section-title">研究分野<span class="en">Fields</span></h2>
       <ul class="fields">
-        {research.fields.map((f) => <li>{f}</li>)}
+        {research.fields.map((f) => (
+          <li>
+            <Icon name={iconForField(f)} size={22} />
+            <span>{f}</span>
+          </li>
+        ))}
       </ul>
       <p class="fields-note note">
         言語学・心理学・認知科学・教育工学の視点を組み合わせ、文系・理系の枠を越えて研究に取り組んでいます。
@@ -75,7 +99,16 @@ const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
 </Base>
 
 <style>
-  .hero { background: var(--paper); padding-block: 4rem; }
+  .hero {
+    background: linear-gradient(170deg, #eef5f6 0%, #f7fafb 45%, var(--paper) 85%);
+    padding-block: 3.5rem 3rem;
+  }
+  .hero-inner { display: grid; gap: 2rem; align-items: center; }
+  @media (min-width: 64rem) {
+    .hero { padding-block: 4.5rem 4rem; }
+    .hero-inner { grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); gap: 2.5rem; }
+  }
+  .hero-figure { max-width: 34rem; margin-inline: auto; width: 100%; }
 
   .hero-id { margin: 0 0 1.5rem; }
   .hero-univ {
@@ -93,17 +126,17 @@ const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
 
   .hero-copy {
     font-family: var(--serif);
-    font-size: clamp(1.6rem, 5vw, 2.6rem);
+    font-size: clamp(1.55rem, 3.6vw, 2.2rem);
     font-weight: 600; line-height: 1.6; letter-spacing: .01em;
-    margin: 0 0 1.75rem; max-width: 46rem;
+    margin: 0 0 1.5rem;
   }
   .hero-copy span { display: inline-block; }
   .hero-lead {
-    max-width: var(--text-w); color: var(--text); margin: 0 0 2.25rem;
+    max-width: var(--text-w); color: var(--text); margin: 0 0 2rem;
     font-size: 1rem;
   }
   .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
-  @media (max-width: 40rem) { .hero { padding-block: 2.5rem 2.5rem; } }
+  @media (max-width: 40rem) { .hero { padding-block: 2.5rem; } }
 
   /* 研究のアプローチ */
   .approach {
@@ -116,9 +149,20 @@ const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
     .approach { grid-template-columns: repeat(2, 1fr); }
   }
   .approach li { background: var(--paper); padding: 1.6rem 1.4rem; }
+  .approach-head {
+    display: flex; align-items: center; gap: .8rem; margin-bottom: 1rem;
+  }
+  .approach-icon {
+    display: grid; place-items: center; width: 3rem; height: 3rem;
+    border-radius: 50%; background: var(--navy-900); color: #fff; flex: none;
+  }
+  /* 段階ごとに色を変えています（1→4で緑・青・紫・紺） */
+  .approach li:nth-child(1) .approach-icon { background: #0f7a72; }
+  .approach li:nth-child(2) .approach-icon { background: #3f7fb3; }
+  .approach li:nth-child(3) .approach-icon { background: #6f6fb0; }
+  .approach li:nth-child(4) .approach-icon { background: #13203a; }
   .approach-num {
-    display: block; font-size: .78rem; font-weight: 700; letter-spacing: .1em;
-    color: var(--teal-600); margin-bottom: .6rem;
+    font-size: .78rem; font-weight: 700; letter-spacing: .1em; color: var(--faint);
   }
   .approach h3 { font-size: .98rem; font-weight: 700; margin: 0 0 .5rem; }
   .approach p { margin: 0; font-size: .85rem; color: var(--muted); line-height: 1.85; }
@@ -131,11 +175,13 @@ const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
   @media (min-width: 34rem) { .fields { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 56rem) { .fields { grid-template-columns: repeat(3, 1fr); } }
   .fields li {
+    display: flex; align-items: center; gap: .8rem;
     border-left: 3px solid var(--teal-600);
     background: var(--tint);
     padding: .9rem 1.1rem;
     font-size: .92rem; font-weight: 500; color: var(--navy-900);
   }
+  .fields li :global(.icon) { color: var(--teal-600); }
   .fields-note { max-width: var(--text-w); }
 
   /* News の「一覧を見る」 */

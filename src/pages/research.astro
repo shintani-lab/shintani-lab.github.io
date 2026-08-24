@@ -1,7 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
+import Icon from '../components/Icon.astro';
 import { site, research } from '../lib/content';
+import { iconForField } from '../lib/icons';
 ---
 <Base title="研究内容" description={research.introduction[0]}>
   <PageHead title="研究内容" en="Research" />
@@ -18,7 +20,12 @@ import { site, research } from '../lib/content';
     <div class="container">
       <h2 class="section-title">研究分野<span class="en">Fields</span></h2>
       <ul class="field-list">
-        {research.fields.map((f) => <li>{f}</li>)}
+        {research.fields.map((f) => (
+          <li>
+            <Icon name={iconForField(f)} size={22} />
+            <span>{f}</span>
+          </li>
+        ))}
       </ul>
     </div>
   </section>
@@ -73,9 +80,11 @@ import { site, research } from '../lib/content';
   @media (min-width: 34rem) { .field-list { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 56rem) { .field-list { grid-template-columns: repeat(3, 1fr); } }
   .field-list li {
+    display: flex; align-items: center; gap: .8rem;
     background: var(--paper); border-left: 3px solid var(--teal-600);
     padding: .9rem 1.1rem; font-size: .92rem; font-weight: 500; color: var(--navy-900);
   }
+  .field-list li :global(.icon) { color: var(--teal-600); }
 
   .card-grid h3 { font-size: .95rem; margin: 0 0 .9rem; }
   .plain { list-style: none; margin: 0; padding: 0; }
