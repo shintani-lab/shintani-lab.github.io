@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shintani-lab.github.io/sitemap.xml

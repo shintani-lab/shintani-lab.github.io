@@ -1,23 +1,30 @@
 ---
 import Base from '../layouts/Base.astro';
+import NewsList from '../components/NewsList.astro';
 import { site, research } from '../lib/content';
-import { getCollection } from 'astro:content';
+import { getPublishedNews } from '../lib/news';
 
 // News は新しい順に3件だけ表示します。draft: true の記事は出しません。
-const allNews = (await getCollection('news', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+const allNews = await getPublishedNews();
 const latestNews = allNews.slice(0, 3);
 
-const fmt = (d: Date) =>
-  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+// キャッチコピーを読点「、」の後ろで区切ります。
+// 区切りごとに span で囲むことで、「捉え、」のような語の途中で
+// 改行されるのを防いでいます（文言を変えてもそのまま働きます）。
+const catchcopyParts = site.catchcopy.main.split(/(?<=、)/);
 ---
 <Base>
   <!-- ヒーロー -->
   <section class="hero">
     <div class="container hero-inner">
-      <p class="hero-en">{site.lab.name_en}</p>
-      <h1 class="hero-copy">{site.catchcopy.main}</h1>
+      <p class="hero-id">
+        <span class="hero-univ">{site.professor.affiliation}</span>
+        <span class="hero-lab">{site.lab.name_ja}</span>
+        <span class="hero-en">{site.lab.name_en}</span>
+      </p>
+      <h1 class="hero-copy">
+        {catchcopyParts.map((part) => <span>{part}</span>)}
+      </h1>
       <p class="hero-lead">{research.introduction[0]}</p>
       <div class="hero-actions">
         <a class="btn" href="/research/">研究内容を見る</a>
@@ -60,47 +67,43 @@ const fmt = (d: Date) =>
     <div class="container">
       <h2 class="section-title">
         News<span class="en">お知らせ</span>
-        {allNews.length > 0 && <a class="section-more" href="/news/">一覧を見る →</a>}
+        {allNews.length > 3 && <a class="section-more" href="/news/">一覧を見る →</a>}
       </h2>
-
-      {latestNews.length === 0 ? (
-        <p class="note">現在お知らせはありません。</p>
-      ) : (
-        <ul class="news-list">
-          {latestNews.map((n) => (
-            <li>
-              <a href={`/news/${n.id}/`}>
-                <time datetime={n.data.date.toISOString()}>{fmt(n.data.date)}</time>
-                <span class="tag">{n.data.category}</span>
-                <span class="news-title">{n.data.title}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+      <NewsList items={latestNews} />
     </div>
   </section>
 </Base>
 
 <style>
-  .hero { background: var(--paper); padding-block: 4.5rem 4rem; }
-  .hero-inner { max-width: 52rem; }
-  .hero-en {
-    font-size: .72rem; letter-spacing: .14em; color: var(--teal-600);
-    margin: 0 0 1.25rem; font-weight: 500;
+  .hero { background: var(--paper); padding-block: 4rem; }
+
+  .hero-id { margin: 0 0 1.5rem; }
+  .hero-univ {
+    display: block; font-size: .8rem; color: var(--muted);
+    letter-spacing: .02em; margin-bottom: .35rem;
   }
+  .hero-lab {
+    display: block; font-size: 1.05rem; font-weight: 700; color: var(--navy-900);
+    line-height: 1.5; padding-left: .75rem; border-left: 3px solid var(--teal-600);
+  }
+  .hero-en {
+    display: block; font-size: .7rem; letter-spacing: .06em; color: var(--muted);
+    padding-left: .75rem; border-left: 3px solid var(--teal-600); line-height: 1.6;
+  }
+
   .hero-copy {
     font-family: var(--serif);
     font-size: clamp(1.6rem, 5vw, 2.6rem);
     font-weight: 600; line-height: 1.6; letter-spacing: .01em;
-    margin: 0 0 1.75rem;
+    margin: 0 0 1.75rem; max-width: 46rem;
   }
+  .hero-copy span { display: inline-block; }
   .hero-lead {
     max-width: var(--text-w); color: var(--text); margin: 0 0 2.25rem;
     font-size: 1rem;
   }
   .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
-  @media (max-width: 40rem) { .hero { padding-block: 3rem 2.5rem; } }
+  @media (max-width: 40rem) { .hero { padding-block: 2.5rem 2.5rem; } }
 
   /* 研究のアプローチ */
   .approach {
@@ -135,23 +138,8 @@ const fmt = (d: Date) =>
   }
   .fields-note { max-width: var(--text-w); }
 
-  /* News */
+  /* News の「一覧を見る」 */
   .section-title .section-more {
     margin-left: auto; font-size: .8rem; font-weight: 500; text-decoration: none;
-  }
-  .news-list { list-style: none; margin: 0; padding: 0; }
-  .news-list li { border-bottom: 1px solid var(--rule); }
-  .news-list li:first-child { border-top: 1px solid var(--rule); }
-  .news-list a {
-    display: grid; gap: .2rem .9rem; padding: 1rem .2rem;
-    text-decoration: none; color: var(--text);
-    grid-template-columns: auto auto 1fr; align-items: baseline;
-  }
-  .news-list a:hover .news-title { color: var(--teal-600); }
-  .news-list time { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .news-title { font-size: .92rem; font-weight: 500; }
-  @media (max-width: 40rem) {
-    .news-list a { grid-template-columns: auto 1fr; }
-    .news-title { grid-column: 1 / -1; }
   }
 </style>

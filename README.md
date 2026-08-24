@@ -15,18 +15,19 @@
 ```
 .
 ├── content/                サイトに載る文章・データ（更新はここだけ）
-│   ├── site.yaml               研究室名・連絡先・所在地
+│   ├── site.yaml               研究室名・教員情報・連絡先・所在地・説明文
 │   ├── research.yaml           紹介文・研究分野・テーマ例
-│   ├── members.yaml            メンバー
+│   ├── members.yaml            学生メンバー（教員は site.yaml 側）
 │   ├── career.yaml             卒業後の進路
 │   ├── publications.yaml       業績
 │   └── news/                   お知らせ（1記事1ファイル）
+├── public/                 画像など（favicon・OGP画像・robots.txt）
 ├── src/                    サイトの見た目（通常は触りません）
 │   ├── layouts/Base.astro      全ページ共通のヘッダー・フッター
-│   ├── components/             共通部品
-│   ├── pages/                  各ページ
+│   ├── components/             共通部品（見出し帯・News一覧）
+│   ├── pages/                  各ページ＋404・sitemap.xml
 │   ├── styles/global.css       色・文字・余白の設定
-│   └── lib/content.ts          content/ を読み込む処理
+│   └── lib/                    content/ の読み込み・日付整形など
 ├── docs/                   打合せ資料
 └── .github/workflows/      push すると自動で公開される設定
 ```

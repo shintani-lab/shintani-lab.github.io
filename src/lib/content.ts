@@ -16,7 +16,7 @@ export type Site = {
   lab: { name_ja: string; name_en: string; short_name: string };
   professor: {
     name_ja: string; name_kana: string; name_en: string;
-    title: string; affiliation: string;
+    title: string; affiliation: string; profile: string;
     links: { researchmap: string; university: string };
   };
   location: {
@@ -25,7 +25,7 @@ export type Site = {
   };
   contact: { email_masked: string };
   catchcopy: { main: string };
-  keywords: string[];
+  description: string;
 };
 
 export type Research = {
@@ -36,10 +36,8 @@ export type Research = {
 };
 
 export type Members = {
-  faculty: { name: string; role: string; photo: string; profile: string;
-             links: { researchmap: string } }[];
+  // 教員の情報は site.yaml で管理しています。
   students: { grade: string; theme: string; name?: string }[] | null;
-  alumni: unknown[] | null;
 };
 
 export type Career = {
@@ -65,13 +63,14 @@ export const students = members.students ?? [];
 export const studentPublications = publications.students ?? [];
 
 // サイト全体のナビゲーション。ここが唯一の定義箇所です。
+// label = 大きく出る文字、sub = その下に小さく出る補助の文字。
 export const nav = [
-  { href: '/',             label: 'ホーム',     en: 'Home' },
-  { href: '/research/',    label: '研究内容',   en: 'Research' },
-  { href: '/projects/',    label: '研究テーマ', en: 'Projects' },
-  { href: '/members/',     label: 'メンバー',   en: 'Members' },
-  { href: '/publications/',label: '業績',       en: 'Publications' },
-  { href: '/news/',        label: 'News',       en: 'News' },
-  { href: '/join/',        label: 'Join Us',    en: 'Join Us' },
-  { href: '/contact/',     label: 'Contact',    en: 'Contact' },
+  { href: '/',             label: 'ホーム',     sub: 'Home' },
+  { href: '/research/',    label: '研究内容',   sub: 'Research' },
+  { href: '/projects/',    label: '研究テーマ', sub: 'Projects' },
+  { href: '/members/',     label: 'メンバー',   sub: 'Members' },
+  { href: '/publications/',label: '業績',       sub: 'Publications' },
+  { href: '/news/',        label: 'News',       sub: 'お知らせ' },
+  { href: '/join/',        label: 'Join Us',    sub: '配属希望' },
+  { href: '/contact/',     label: 'Contact',    sub: '連絡先' },
 ];

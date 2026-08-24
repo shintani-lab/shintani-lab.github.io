@@ -1,0 +1,41 @@
+---
+// アドレスが間違っていたときに表示されるページです。
+// GitHub Pages がこの 404.html を自動的に使います。
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { nav } from '../lib/content';
+---
+<Base title="ページが見つかりません" noindex={true}>
+  <PageHead title="ページが見つかりません" en="404 Not Found" />
+
+  <section class="section">
+    <div class="container">
+      <p class="prose lead">
+        お探しのページは、移動または削除された可能性があります。
+        お手数ですが、下のリンクからお探しください。
+      </p>
+      <ul class="page-links">
+        {nav.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-links {
+    list-style: none; margin: 2rem 0 0; padding: 0;
+    display: grid; gap: .75rem;
+  }
+  @media (min-width: 34rem) { .page-links { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 56rem) { .page-links { grid-template-columns: repeat(4, 1fr); } }
+  .page-links li {
+    background: var(--tint); border: 1px solid var(--rule);
+  }
+  .page-links a {
+    display: block; padding: .9rem 1.1rem;
+    font-size: .92rem; font-weight: 500; text-decoration: none;
+  }
+  .page-links a:hover { background: var(--teal-050); }
+</style>

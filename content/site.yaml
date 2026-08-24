@@ -13,6 +13,9 @@ professor:
   name_en: Mayu Shintani      # ★ researchmap の英語表記と突き合わせる
   title: 教授
   affiliation: 芝浦工業大学 工学部
+  # ★ 先生のご紹介文（経歴・関心など）。書くとメンバーページに表示されます。
+  #    空のままなら何も表示されません。
+  profile: ""
   links:
     researchmap: https://researchmap.jp/mayushintani
     university: https://www.shibaura-it.ac.jp/faculty/laboratory/00146.html
@@ -32,9 +35,7 @@ contact:
 catchcopy:
   main: ことばとこころをデータで捉え、見えない構造を可視化する。
 
-keywords:
-  - 言語データ分析
-  - 認知言語学
-  - 心理測定
-  - 教育工学
-  - テキストマイニング
+# 検索結果やSNSに表示される研究室の説明文（120字程度が目安）。
+# 全ページ共通の初期値として使われます。
+# ※ 途中で改行すると余計な空白が入るため、1行で書いてください。
+description: "芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）の公式サイトです。テキストマイニング、心理測定、統計解析を用いて、ことばと人の認知・心理をデータから分析しています。"

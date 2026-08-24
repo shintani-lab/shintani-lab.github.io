@@ -1,31 +1,32 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
+import { getPublishedNews } from '../../lib/news';
+import { formatJa } from '../../lib/format';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const items = await getCollection('news', ({ data }) => !data.draft);
+  const items = await getPublishedNews();
   return items.map((item) => ({ params: { id: item.id }, props: { item } }));
 };
 
 const { item } = Astro.props;
 const { Content } = await render(item);
-
-const fmt = (d: Date) =>
-  `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 ---
 <Base title={item.data.title} description={item.data.title}>
   <article class="section">
-    <div class="container article">
-      <div class="article-meta">
-        <time datetime={item.data.date.toISOString()}>{fmt(item.data.date)}</time>
-        <span class="tag">{item.data.category}</span>
+    <div class="container">
+      <div class="article">
+        <div class="article-meta">
+          <time datetime={item.data.date.toISOString()}>{formatJa(item.data.date)}</time>
+          <span class="tag">{item.data.category}</span>
+        </div>
+        <h1 class="article-title">{item.data.title}</h1>
+        <div class="article-body prose">
+          <Content />
+        </div>
+        <p class="back"><a href="/news/">← News 一覧へ戻る</a></p>
       </div>
-      <h1 class="article-title">{item.data.title}</h1>
-      <div class="article-body prose">
-        <Content />
-      </div>
-      <p class="back"><a href="/news/">← News 一覧へ戻る</a></p>
     </div>
   </article>
 </Base>
