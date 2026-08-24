@@ -214,3 +214,8 @@ npm run dev
   文言を変える際は先生にご確認ください（`content/research.yaml` の `approach:`）。
 - 顔写真は意図的に載せていません。毎年の差し替えと同意管理の手間、
   卒業生の写真を消し忘れる事故を避けるためです。
+- **`package-lock.json` を更新したときは注意してください。** Windowsで
+  `npm install` を実行すると、Linux用の依存情報が欠けたロックファイルが
+  できることがあり、自動デプロイ（Linux上で動きます）が失敗します。
+  失敗したら `package-lock.json` と `node_modules` を削除して
+  `npm install` をやり直すと直ります。通常の文章更新では発生しません。
