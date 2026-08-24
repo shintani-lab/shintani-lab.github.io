@@ -26,7 +26,7 @@ const stepIcons: Record<number, string> = {
   <!-- ヒーロー -->
   <section class="hero">
     <div class="container hero-inner">
-      <div class="hero-text">
+      <div class="hero-head">
         <p class="hero-id">
           <span class="hero-univ">{site.professor.affiliation}</span>
           <span class="hero-lab">{site.lab.name_ja}</span>
@@ -35,14 +35,18 @@ const stepIcons: Record<number, string> = {
         <h1 class="hero-copy">
           {catchcopyParts.map((part) => <span>{part}</span>)}
         </h1>
+      </div>
+
+      <div class="hero-figure">
+        <HeroGraphic />
+      </div>
+
+      <div class="hero-body">
         <p class="hero-lead">{research.introduction[0]}</p>
         <div class="hero-actions">
           <a class="btn" href="/research/">研究内容を見る</a>
           <a class="btn btn--ghost" href="/join/">配属を考えている方へ</a>
         </div>
-      </div>
-      <div class="hero-figure">
-        <HeroGraphic />
       </div>
     </div>
   </section>
@@ -103,12 +107,26 @@ const stepIcons: Record<number, string> = {
     background: linear-gradient(170deg, #eef5f6 0%, #f7fafb 45%, var(--paper) 85%);
     padding-block: 3.5rem 3rem;
   }
-  .hero-inner { display: grid; gap: 2rem; align-items: center; }
+  .hero-inner {
+    display: grid; align-items: center;
+    grid-template-areas: "head" "figure" "body";
+  }
+  .hero-head { grid-area: head; }
+  .hero-figure {
+    grid-area: figure; width: 100%; max-width: 30rem;
+    margin: .25rem auto 1.75rem;
+  }
+  .hero-body { grid-area: body; }
+
   @media (min-width: 64rem) {
     .hero { padding-block: 4.5rem 4rem; }
-    .hero-inner { grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); gap: 2.5rem; }
+    .hero-inner {
+      grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+      grid-template-areas: "head figure" "body figure";
+      column-gap: 2.5rem;
+    }
+    .hero-figure { max-width: 34rem; margin: 0 auto; }
   }
-  .hero-figure { max-width: 34rem; margin-inline: auto; width: 100%; }
 
   .hero-id { margin: 0 0 1.5rem; }
   .hero-univ {
