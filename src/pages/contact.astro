@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { site } from '../lib/content';
+---
+<Base title="Contact" description="研究室の所在地と連絡先です。">
+  <PageHead title="Contact" en="連絡先" />
+
+  <section class="section">
+    <div class="container">
+      <dl class="contact-list">
+        <div>
+          <dt>研究室</dt>
+          <dd>
+            {site.lab.name_ja}
+            <span class="sub">{site.lab.name_en}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>教員</dt>
+          <dd>
+            {site.professor.affiliation}　{site.professor.title}　{site.professor.name_ja}
+            <span class="sub">{site.professor.name_kana}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>ゼミ実施場所</dt>
+          <dd>
+            {site.location.seminar.campus}
+            <span class="sub">{site.location.seminar.address}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>教員所属</dt>
+          <dd>
+            {site.location.office.campus}
+            <span class="sub">{site.location.office.room}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>メール</dt>
+          <dd>
+            {site.contact.email_masked}
+            <span class="sub">
+              迷惑メール対策のため、◎ を @ に置き換えて送信してください。
+            </span>
+          </dd>
+        </div>
+      </dl>
+
+      <h2 class="section-title links-title">関連リンク<span class="en">Links</span></h2>
+      <ul class="link-list">
+        <li>
+          <a href={site.professor.links.university} target="_blank" rel="noopener">
+            芝浦工業大学 公式サイト内の研究室ページ
+          </a>
+        </li>
+        <li>
+          <a href={site.professor.links.researchmap} target="_blank" rel="noopener">
+            researchmap（{site.professor.name_ja}）
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact-list { margin: 0 0 3.5rem; max-width: 52rem; }
+  .contact-list > div {
+    display: grid; grid-template-columns: 10rem 1fr; gap: 1rem;
+    padding: 1.1rem .2rem; border-bottom: 1px solid var(--rule);
+  }
+  .contact-list > div:first-child { border-top: 1px solid var(--rule); }
+  .contact-list dt { font-size: .85rem; font-weight: 500; color: var(--teal-600); }
+  .contact-list dd { margin: 0; font-size: .95rem; color: var(--navy-900); }
+  .contact-list .sub {
+    display: block; font-size: .82rem; color: var(--muted); margin-top: .25rem;
+    font-weight: 400;
+  }
+  @media (max-width: 34rem) {
+    .contact-list > div { grid-template-columns: 1fr; gap: .3rem; }
+  }
+
+  .links-title { margin-top: 0; }
+  .link-list { list-style: none; margin: 0; padding: 0; }
+  .link-list li { padding: .6rem 0; border-bottom: 1px solid var(--rule-soft); }
+  .link-list a { font-size: .92rem; font-weight: 500; }
+</style>

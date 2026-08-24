@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { site, research, career } from '../lib/content';
+---
+<Base
+  title="Join Us"
+  description="配属を検討している方へ。研究室で身につく力、卒業後の進路をご紹介します。"
+>
+  <PageHead title="Join Us" en="配属を検討している方へ" />
+
+  <section class="section">
+    <div class="container">
+      <div class="prose lead">
+        <p>{research.introduction[2]}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">身につく力<span class="en">What You Learn</span></h2>
+      <ul class="skill-list">
+        {research.fields.map((f) => <li>{f}</li>)}
+      </ul>
+      <p class="note skill-note">
+        プログラミングや統計の経験は問いません。ことばや人の心に関心があり、
+        データから考えることに興味がある方を歓迎します。
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">卒業後の進路<span class="en">Career</span></h2>
+      <ul class="career-list">
+        {career.categories.map((c) => <li>{c}</li>)}
+      </ul>
+      <p class="note career-note">{career.note}</p>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">お問い合わせ<span class="en">Contact</span></h2>
+      <p class="prose">
+        研究室の見学や、研究内容についてのご質問を歓迎しています。
+        まずはお気軽にご連絡ください。
+      </p>
+      <div class="join-actions">
+        <a class="btn" href="/contact/">連絡先を見る</a>
+        <a class="btn btn--ghost" href={site.professor.links.university} target="_blank" rel="noopener">
+          大学公式ページ
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .skill-list, .career-list {
+    list-style: none; margin: 0 0 1.5rem; padding: 0;
+    display: grid; gap: .75rem;
+  }
+  @media (min-width: 34rem) {
+    .skill-list, .career-list { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 56rem) {
+    .skill-list, .career-list { grid-template-columns: repeat(3, 1fr); }
+  }
+  .skill-list li {
+    background: var(--paper); border-left: 3px solid var(--teal-600);
+    padding: .9rem 1.1rem; font-size: .92rem; font-weight: 500; color: var(--navy-900);
+  }
+  .career-list li {
+    background: var(--tint); padding: .9rem 1.1rem;
+    font-size: .92rem; font-weight: 500; color: var(--navy-900);
+    border: 1px solid var(--rule);
+  }
+  .skill-note, .career-note { max-width: var(--text-w); }
+  .join-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+</style>

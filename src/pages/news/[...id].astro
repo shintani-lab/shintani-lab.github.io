@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const items = await getCollection('news', ({ data }) => !data.draft);
+  return items.map((item) => ({ params: { id: item.id }, props: { item } }));
+};
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+---
+<Base title={item.data.title} description={item.data.title}>
+  <article class="section">
+    <div class="container article">
+      <div class="article-meta">
+        <time datetime={item.data.date.toISOString()}>{fmt(item.data.date)}</time>
+        <span class="tag">{item.data.category}</span>
+      </div>
+      <h1 class="article-title">{item.data.title}</h1>
+      <div class="article-body prose">
+        <Content />
+      </div>
+      <p class="back"><a href="/news/">← News 一覧へ戻る</a></p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .article { max-width: var(--text-w); }
+  .article-meta {
+    display: flex; align-items: center; gap: .9rem; flex-wrap: wrap;
+    margin-bottom: .9rem;
+  }
+  .article-meta time { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .article-title {
+    font-size: clamp(1.3rem, 4vw, 1.7rem); font-weight: 700;
+    padding-bottom: 1.25rem; margin-bottom: 2rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .article-body :global(h2) { font-size: 1.1rem; margin: 2.5rem 0 .8rem; }
+  .article-body :global(h3) { font-size: 1rem; margin: 2rem 0 .6rem; }
+  .article-body :global(ul), .article-body :global(ol) { padding-left: 1.4em; margin: 0 0 1.4rem; }
+  .article-body :global(li) { margin-bottom: .4rem; }
+  .article-body :global(img) { margin: 1.5rem 0; }
+  .back { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+  .back a { font-size: .9rem; font-weight: 500; }
+</style>

@@ -1,0 +1,88 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { site, research } from '../lib/content';
+---
+<Base title="研究内容" description={research.introduction[0]}>
+  <PageHead title="研究内容" en="Research" />
+
+  <section class="section">
+    <div class="container">
+      <div class="prose lead">
+        {research.introduction.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">研究分野<span class="en">Fields</span></h2>
+      <ul class="field-list">
+        {research.fields.map((f) => <li>{f}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">扱うデータと手法<span class="en">Data &amp; Methods</span></h2>
+      <div class="card-grid card-grid--2">
+        <div>
+          <h3>扱うデータ</h3>
+          <ul class="plain">
+            <li>テキストデータ</li>
+            <li>質問紙調査</li>
+            <li>心理状態に関するデータ</li>
+            <li>学習・行動データ</li>
+          </ul>
+        </div>
+        <div>
+          <h3>分析の手法</h3>
+          <ul class="plain">
+            <li>Python等によるデータ処理</li>
+            <li>テキストマイニング</li>
+            <li>心理測定</li>
+            <li>統計解析</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note methods-note">
+        得られた結果は、言語学、心理学、認知科学、教育工学などの視点から解釈します。
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">教員の研究業績<span class="en">Publications</span></h2>
+      <p class="prose">
+        {site.professor.name_ja}の研究業績は researchmap に掲載しています。
+      </p>
+      <a class="btn" href={site.professor.links.researchmap} target="_blank" rel="noopener">
+        researchmap で業績を見る
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .field-list {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: .75rem;
+  }
+  @media (min-width: 34rem) { .field-list { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 56rem) { .field-list { grid-template-columns: repeat(3, 1fr); } }
+  .field-list li {
+    background: var(--paper); border-left: 3px solid var(--teal-600);
+    padding: .9rem 1.1rem; font-size: .92rem; font-weight: 500; color: var(--navy-900);
+  }
+
+  .card-grid h3 { font-size: .95rem; margin: 0 0 .9rem; }
+  .plain { list-style: none; margin: 0; padding: 0; }
+  .plain li {
+    padding: .45rem 0; border-bottom: 1px solid var(--rule-soft);
+    font-size: .9rem;
+  }
+  .plain li:last-child { border-bottom: none; }
+  .methods-note { margin-top: 1.25rem; max-width: var(--text-w); }
+</style>

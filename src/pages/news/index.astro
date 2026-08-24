@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import { getCollection } from 'astro:content';
+
+const items = (await getCollection('news', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+---
+<Base title="News" description="研究室からのお知らせです。">
+  <PageHead title="News" en="お知らせ" />
+
+  <section class="section">
+    <div class="container">
+      {items.length === 0 ? (
+        <p class="note">現在お知らせはありません。</p>
+      ) : (
+        <ul class="news-list">
+          {items.map((n) => (
+            <li>
+              <a href={`/news/${n.id}/`}>
+                <time datetime={n.data.date.toISOString()}>{fmt(n.data.date)}</time>
+                <span class="tag">{n.data.category}</span>
+                <span class="news-title">{n.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .news-list { list-style: none; margin: 0; padding: 0; }
+  .news-list li { border-bottom: 1px solid var(--rule); }
+  .news-list li:first-child { border-top: 1px solid var(--rule); }
+  .news-list a {
+    display: grid; gap: .2rem .9rem; padding: 1.1rem .2rem;
+    text-decoration: none; color: var(--text);
+    grid-template-columns: auto auto 1fr; align-items: baseline;
+  }
+  .news-list a:hover .news-title { color: var(--teal-600); }
+  .news-list time { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .news-title { font-size: .95rem; font-weight: 500; }
+  @media (max-width: 40rem) {
+    .news-list a { grid-template-columns: auto 1fr; }
+    .news-title { grid-column: 1 / -1; }
+  }
+</style>

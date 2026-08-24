@@ -1,0 +1,88 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { site, students } from '../lib/content';
+---
+<Base title="メンバー" description="研究室のメンバーを紹介します。">
+  <PageHead title="メンバー" en="Members" />
+
+  <!-- 教員 -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">教員<span class="en">Faculty</span></h2>
+      <div class="faculty">
+        <p class="faculty-name">
+          {site.professor.name_ja}
+          <span class="faculty-kana">{site.professor.name_kana}</span>
+        </p>
+        <p class="faculty-title">
+          {site.professor.affiliation}　{site.professor.title}
+        </p>
+        <ul class="faculty-links">
+          <li>
+            <a href={site.professor.links.researchmap} target="_blank" rel="noopener">
+              researchmap
+            </a>
+          </li>
+          <li>
+            <a href={site.professor.links.university} target="_blank" rel="noopener">
+              大学公式の研究室ページ
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 学生 -->
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">学生<span class="en">Students</span></h2>
+
+      {students.length === 0 ? (
+        <p class="note">
+          現在、掲載準備中です。
+        </p>
+      ) : (
+        <ul class="student-list">
+          {students.map((s) => (
+            <li>
+              <span class="grade">{s.grade}</span>
+              <div class="student-body">
+                {s.name && <p class="student-name">{s.name}</p>}
+                <p class="student-theme">{s.theme}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .faculty { max-width: var(--text-w); }
+  .faculty-name {
+    font-size: 1.35rem; font-weight: 700; color: var(--navy-900);
+    margin: 0 0 .3rem; display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap;
+  }
+  .faculty-kana { font-size: .78rem; font-weight: 400; color: var(--muted); }
+  .faculty-title { margin: 0 0 1.25rem; color: var(--text); font-size: .95rem; }
+  .faculty-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .faculty-links a { font-size: .9rem; font-weight: 500; }
+
+  .student-list { list-style: none; margin: 0; padding: 0; }
+  .student-list li {
+    display: grid; grid-template-columns: 6rem 1fr; gap: 1rem;
+    padding: 1.1rem .2rem; border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .student-list li:first-child { border-top: 1px solid var(--rule); }
+  .grade { font-size: .82rem; font-weight: 500; color: var(--teal-600); }
+  .student-body p { margin: 0; }
+  .student-name { font-weight: 700; color: var(--navy-900); font-size: .95rem; margin-bottom: .2rem; }
+  .student-theme { font-size: .9rem; color: var(--text); }
+  @media (max-width: 34rem) {
+    .student-list li { grid-template-columns: 1fr; gap: .3rem; }
+  }
+</style>

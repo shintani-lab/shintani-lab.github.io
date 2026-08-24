@@ -1,31 +1,157 @@
 ---
-// 公開経路の疎通確認用の仮ページです。
-// 本実装に入る際に、このファイルは差し替えます。
-const title = '認知言語学・言語データ分析研究室';
+import Base from '../layouts/Base.astro';
+import { site, research } from '../lib/content';
+import { getCollection } from 'astro:content';
+
+// News は新しい順に3件だけ表示します。draft: true の記事は出しません。
+const allNews = (await getCollection('news', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const latestNews = allNews.slice(0, 3);
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 ---
-<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex" />
-    <title>{title}｜準備中</title>
-    <style>
-      body {
-        margin: 0; min-height: 100svh;
-        display: grid; place-items: center;
-        font-family: system-ui, "Hiragino Sans", "Yu Gothic", sans-serif;
-        background: #fafbfc; color: #16233c;
-      }
-      main { text-align: center; padding: 2rem; }
-      h1 { font-size: 1.25rem; font-weight: 700; margin: 0 0 .5rem; }
-      p { color: #64738c; font-size: .9rem; margin: 0; }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>{title}</h1>
-      <p>Webサイトは準備中です。</p>
-    </main>
-  </body>
-</html>
+<Base>
+  <!-- ヒーロー -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <p class="hero-en">{site.lab.name_en}</p>
+      <h1 class="hero-copy">{site.catchcopy.main}</h1>
+      <p class="hero-lead">{research.introduction[0]}</p>
+      <div class="hero-actions">
+        <a class="btn" href="/research/">研究内容を見る</a>
+        <a class="btn btn--ghost" href="/join/">配属を考えている方へ</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 研究のアプローチ -->
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">研究のアプローチ<span class="en">Approach</span></h2>
+      <ol class="approach">
+        {research.approach.map((a) => (
+          <li>
+            <span class="approach-num">{String(a.step).padStart(2, '0')}</span>
+            <h3>{a.title}</h3>
+            <p>{a.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 研究分野 -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">研究分野<span class="en">Fields</span></h2>
+      <ul class="fields">
+        {research.fields.map((f) => <li>{f}</li>)}
+      </ul>
+      <p class="fields-note note">
+        言語学・心理学・認知科学・教育工学の視点を組み合わせ、文系・理系の枠を越えて研究に取り組んでいます。
+      </p>
+    </div>
+  </section>
+
+  <!-- News -->
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">
+        News<span class="en">お知らせ</span>
+        {allNews.length > 0 && <a class="section-more" href="/news/">一覧を見る →</a>}
+      </h2>
+
+      {latestNews.length === 0 ? (
+        <p class="note">現在お知らせはありません。</p>
+      ) : (
+        <ul class="news-list">
+          {latestNews.map((n) => (
+            <li>
+              <a href={`/news/${n.id}/`}>
+                <time datetime={n.data.date.toISOString()}>{fmt(n.data.date)}</time>
+                <span class="tag">{n.data.category}</span>
+                <span class="news-title">{n.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { background: var(--paper); padding-block: 4.5rem 4rem; }
+  .hero-inner { max-width: 52rem; }
+  .hero-en {
+    font-size: .72rem; letter-spacing: .14em; color: var(--teal-600);
+    margin: 0 0 1.25rem; font-weight: 500;
+  }
+  .hero-copy {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 5vw, 2.6rem);
+    font-weight: 600; line-height: 1.6; letter-spacing: .01em;
+    margin: 0 0 1.75rem;
+  }
+  .hero-lead {
+    max-width: var(--text-w); color: var(--text); margin: 0 0 2.25rem;
+    font-size: 1rem;
+  }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+  @media (max-width: 40rem) { .hero { padding-block: 3rem 2.5rem; } }
+
+  /* 研究のアプローチ */
+  .approach {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: 1px; background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  @media (min-width: 52rem) { .approach { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 34rem) and (max-width: 51.999rem) {
+    .approach { grid-template-columns: repeat(2, 1fr); }
+  }
+  .approach li { background: var(--paper); padding: 1.6rem 1.4rem; }
+  .approach-num {
+    display: block; font-size: .78rem; font-weight: 700; letter-spacing: .1em;
+    color: var(--teal-600); margin-bottom: .6rem;
+  }
+  .approach h3 { font-size: .98rem; font-weight: 700; margin: 0 0 .5rem; }
+  .approach p { margin: 0; font-size: .85rem; color: var(--muted); line-height: 1.85; }
+
+  /* 研究分野 */
+  .fields {
+    list-style: none; margin: 0 0 1.5rem; padding: 0;
+    display: grid; gap: .75rem;
+  }
+  @media (min-width: 34rem) { .fields { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 56rem) { .fields { grid-template-columns: repeat(3, 1fr); } }
+  .fields li {
+    border-left: 3px solid var(--teal-600);
+    background: var(--tint);
+    padding: .9rem 1.1rem;
+    font-size: .92rem; font-weight: 500; color: var(--navy-900);
+  }
+  .fields-note { max-width: var(--text-w); }
+
+  /* News */
+  .section-title .section-more {
+    margin-left: auto; font-size: .8rem; font-weight: 500; text-decoration: none;
+  }
+  .news-list { list-style: none; margin: 0; padding: 0; }
+  .news-list li { border-bottom: 1px solid var(--rule); }
+  .news-list li:first-child { border-top: 1px solid var(--rule); }
+  .news-list a {
+    display: grid; gap: .2rem .9rem; padding: 1rem .2rem;
+    text-decoration: none; color: var(--text);
+    grid-template-columns: auto auto 1fr; align-items: baseline;
+  }
+  .news-list a:hover .news-title { color: var(--teal-600); }
+  .news-list time { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .news-title { font-size: .92rem; font-weight: 500; }
+  @media (max-width: 40rem) {
+    .news-list a { grid-template-columns: auto 1fr; }
+    .news-title { grid-column: 1 / -1; }
+  }
+</style>

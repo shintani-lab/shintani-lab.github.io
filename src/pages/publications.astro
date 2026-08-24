@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { site, publications, studentPublications } from '../lib/content';
+
+// 学生の業績を年度ごとにまとめます。
+const byYear = new Map<number, typeof studentPublications>();
+for (const p of studentPublications) {
+  const list = byYear.get(p.year) ?? [];
+  list.push(p);
+  byYear.set(p.year, list);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+<Base title="業績" description="研究室の研究業績を掲載しています。">
+  <PageHead title="業績" en="Publications" />
+
+  <!-- 教員 -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">教員の業績<span class="en">Faculty</span></h2>
+      <p class="prose">
+        {site.professor.name_ja}の研究業績は researchmap にまとめています。
+        最新の情報はそちらをご覧ください。
+      </p>
+      <a class="btn" href={publications.faculty.researchmap} target="_blank" rel="noopener">
+        researchmap で業績を見る
+      </a>
+    </div>
+  </section>
+
+  <!-- 学生 -->
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">学生の業績<span class="en">Students</span></h2>
+
+      {studentPublications.length === 0 ? (
+        <p class="note">現在、掲載準備中です。</p>
+      ) : (
+        years.map((year) => (
+          <div class="year-block">
+            <h3 class="year">{year}年</h3>
+            <ul class="pub-list">
+              {byYear.get(year)!.map((p) => (
+                <li>
+                  <span class="tag">{p.type}</span>
+                  <div class="pub-body">
+                    <p class="pub-title">
+                      {p.url ? (
+                        <a href={p.url} target="_blank" rel="noopener">{p.title}</a>
+                      ) : (
+                        p.title
+                      )}
+                    </p>
+                    <p class="pub-meta">{p.authors}　{p.venue}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .year-block + .year-block { margin-top: 2.5rem; }
+  .year {
+    font-size: 1rem; font-weight: 700; color: var(--teal-600);
+    margin: 0 0 .8rem; letter-spacing: .02em;
+  }
+  .pub-list { list-style: none; margin: 0; padding: 0; }
+  .pub-list li {
+    display: grid; grid-template-columns: auto 1fr; gap: .9rem;
+    padding: 1rem .2rem; border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .pub-list li:first-child { border-top: 1px solid var(--rule); }
+  .pub-body p { margin: 0; }
+  .pub-title { font-size: .95rem; font-weight: 500; color: var(--navy-900); }
+  .pub-meta { font-size: .82rem; color: var(--muted); margin-top: .25rem; }
+  @media (max-width: 34rem) {
+    .pub-list li { grid-template-columns: 1fr; gap: .5rem; }
+  }
+</style>
