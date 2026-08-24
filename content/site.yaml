@@ -1,0 +1,40 @@
+# サイト全体の基本情報
+# 【提供】2026-08-24 新谷先生より正式な掲載情報を受領
+# ※ ★印は未確定の項目
+
+lab:
+  name_ja: 認知言語学・言語データ分析研究室
+  name_en: Cognitive Linguistics and Language Data Analysis Lab
+  short_name: 新谷研
+
+professor:
+  name_ja: 新谷 真由
+  name_kana: しんたに まゆ
+  name_en: Mayu Shintani      # ★ researchmap の英語表記と突き合わせる
+  title: 教授
+  affiliation: 芝浦工業大学 工学部
+  links:
+    researchmap: https://researchmap.jp/mayushintani
+    university: https://www.shibaura-it.ac.jp/faculty/laboratory/00146.html
+
+# 二拠点。両方を併記する。
+location:
+  seminar:                    # ゼミ実施場所
+    campus: 豊洲キャンパス
+    address: 〒135-8548 東京都江東区豊洲3-7-5
+  office:                     # 教員所属
+    campus: 大宮キャンパス
+    room: 4号館4F 4402-2
+
+contact:
+  email_masked: shintani◎shibaura-it.ac.jp   # 大学HPと同じくマスク表記（スパム対策）
+
+catchcopy:
+  main: ことばとこころをデータで捉え、見えない構造を可視化する。
+
+keywords:
+  - 言語データ分析
+  - 認知言語学
+  - 心理測定
+  - 教育工学
+  - テキストマイニング
