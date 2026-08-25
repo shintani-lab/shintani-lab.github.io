@@ -3,8 +3,11 @@ import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
 import { site } from '../lib/content';
 ---
-<Base title="Contact" description="研究室の所在地と連絡先です。">
-  <PageHead title="Contact" en="連絡先" />
+<Base
+  title="連絡先"
+  description="芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）の連絡先です。ゼミは豊洲キャンパス、教員室は大宮キャンパス4号館4Fにあります。研究室の見学やご質問はメールでお問い合わせください。"
+>
+  <PageHead title="連絡先" en="Contact" />
 
   <section class="section">
     <div class="container">
@@ -49,7 +52,7 @@ import { site } from '../lib/content';
       </dl>
 
       <h2 class="section-title links-title">関連リンク<span class="en">Links</span></h2>
-      <ul class="link-list">
+      <ul class="link-list" role="list">
         <li>
           <a href={site.professor.links.university} target="_blank" rel="noopener">
             芝浦工業大学 公式サイト内の研究室ページ

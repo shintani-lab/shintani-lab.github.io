@@ -45,6 +45,9 @@ const isCurrent = (href: string) =>
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="ja_JP" />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={site.lab.name_ja} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -60,7 +63,7 @@ const isCurrent = (href: string) =>
       <div class="container header-inner">
         <a class="brand" href="/">
           <span class="brand-ja">{site.lab.name_ja}</span>
-          <span class="brand-en">{site.lab.name_en}</span>
+          <span class="brand-en" lang="en">{site.lab.name_en}</span>
         </a>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
@@ -71,7 +74,7 @@ const isCurrent = (href: string) =>
         </button>
 
         <nav class="site-nav" id="site-nav" aria-label="サイト内">
-          <ul>
+          <ul role="list">
             {nav.map((item) => (
               <li>
                 <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
@@ -85,7 +88,7 @@ const isCurrent = (href: string) =>
       </div>
     </header>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
       <slot />
     </main>
 
@@ -93,7 +96,7 @@ const isCurrent = (href: string) =>
       <div class="container footer-inner">
         <div class="footer-lab">
           <p class="footer-name">{site.lab.name_ja}</p>
-          <p class="footer-name-en">{site.lab.name_en}</p>
+          <p class="footer-name-en" lang="en">{site.lab.name_en}</p>
           <p class="footer-prof">
             {site.professor.affiliation}　{site.professor.title}　{site.professor.name_ja}
           </p>
@@ -159,6 +162,8 @@ const isCurrent = (href: string) =>
         background: var(--navy-900); color: #fff; padding: .7rem 1.2rem;
       }
       .skip:focus { left: 0; }
+      /* スキップリンクで飛んだ先が固定ヘッダーに隠れないようにします */
+      #main { scroll-margin-top: 5rem; outline: none; }
 
       /* ---------- ヘッダー ---------- */
       .site-header {
@@ -223,7 +228,13 @@ const isCurrent = (href: string) =>
           display: none; width: 100%; order: 3;
           border-top: 1px solid var(--rule); padding-block: .5rem 1rem;
         }
-        .site-nav.is-open { display: block; }
+        .site-nav.is-open {
+          display: block;
+          /* 画面が低いとき（横向きなど）に、下の項目まで届くようにします */
+          max-height: calc(100dvh - 3.75rem);
+          overflow-y: auto;
+          overscroll-behavior: contain;
+        }
         .site-nav ul { flex-direction: column; gap: 0; }
         .site-nav li + li { border-top: 1px solid var(--rule-soft); }
         .site-nav a {

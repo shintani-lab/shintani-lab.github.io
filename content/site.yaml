@@ -4,13 +4,12 @@
 
 lab:
   name_ja: 認知言語学・言語データ分析研究室
-  name_en: Cognitive Linguistics and Language Data Analysis Lab
-  short_name: 新谷研
+  # 大学公式ページの英語表記に合わせています
+  name_en: Cognitive Linguistics and Language Data Analysis Laboratory
 
 professor:
   name_ja: 新谷 真由
   name_kana: しんたに まゆ
-  name_en: Mayu Shintani      # ★ researchmap の英語表記と突き合わせる
   title: 教授
   affiliation: 芝浦工業大学 工学部
   # ★ 先生のご紹介文（経歴・関心など）。書くとメンバーページに表示されます。
@@ -35,8 +34,6 @@ contact:
 catchcopy:
   main: ことばとこころをデータで捉え、見えない構造を可視化する。
 
-# 検索結果やSNSに表示される研究室の説明文（120字程度が目安）。
-# 全ページ共通の初期値として使われます。
 # トップページのイラスト（ネットワーク図）に表示する言葉です。
 # 上から順に、図の左上・中央・右下…と割り当てられます。8語まで表示されます。
 graphic_words:
@@ -49,5 +46,7 @@ graphic_words:
   - 分析
   - 教育
 
+# 検索結果やSNSに表示される研究室の説明文（120字程度が目安）。
+# ページ側で指定が無いときの、全ページ共通の初期値として使われます。
 # ※ 途中で改行すると余計な空白が入るため、1行で書いてください。
 description: "芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）の公式サイトです。テキストマイニング、心理測定、統計解析を用いて、ことばと人の認知・心理をデータから分析しています。"

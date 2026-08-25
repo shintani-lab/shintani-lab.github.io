@@ -6,10 +6,10 @@ import { site, research, career } from '../lib/content';
 import { iconForField } from '../lib/icons';
 ---
 <Base
-  title="Join Us"
-  description="配属を検討している方へ。研究室で身につく力、卒業後の進路をご紹介します。"
+  title="配属を検討している方へ"
+  description="芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）への配属を検討している方へ。ゼミの内容、学べる分野、卒業後の進路をご紹介します。プログラミングや統計解析が初めての方も歓迎します。"
 >
-  <PageHead title="Join Us" en="配属を検討している方へ" />
+  <PageHead title="配属を検討している方へ" en="Join Us" />
 
   <section class="section">
     <div class="container">
@@ -21,8 +21,8 @@ import { iconForField } from '../lib/icons';
 
   <section class="section section--tint">
     <div class="container">
-      <h2 class="section-title">身につく力<span class="en">What You Learn</span></h2>
-      <ul class="skill-list">
+      <h2 class="section-title">学べる分野<span class="en">Fields</span></h2>
+      <ul class="skill-list" role="list">
         {research.fields.map((f) => (
           <li>
             <Icon name={iconForField(f)} size={22} />
@@ -31,8 +31,8 @@ import { iconForField } from '../lib/icons';
         ))}
       </ul>
       <p class="note skill-note">
-        プログラミングや統計の経験は問いません。ことばや人の心に関心があり、
-        データから考えることに興味がある方を歓迎します。
+        プログラミングや統計解析が初めての方でも、段階的に学べるよう指導しています。
+        ことばや人のこころに関心があり、データから考えることに興味のある方を歓迎します。
       </p>
     </div>
   </section>

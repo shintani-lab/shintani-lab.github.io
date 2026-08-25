@@ -5,7 +5,7 @@ import { research } from '../lib/content';
 ---
 <Base
   title="研究テーマ"
-  description="卒業研究のテーマ例をご紹介します。ことばの意味や使用から、学習者の心理、異文化コミュニケーション、人とAIとの関わりまで多岐にわたります。"
+  description="芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）の研究テーマです。ことばの意味や使用から、学習者の心理、異文化コミュニケーション、人とAIとの関わりまで、幅広いテーマに取り組んでいます。"
 >
   <PageHead title="研究テーマ" en="Projects" />
 
@@ -20,17 +20,26 @@ import { research } from '../lib/content';
 
   <section class="section section--tint">
     <div class="container">
-      <h2 class="section-title">卒業研究のテーマ例<span class="en">Past Themes</span></h2>
-      <ul class="theme-grid">
-        {research.past_themes.map((t, i) => (
+      <h2 class="section-title">研究室の研究テーマ<span class="en">Research Themes</span></h2>
+      <ul class="theme-grid" role="list">
+        {research.themes.map((t, i) => (
           <li>
             <span class="theme-num">{String(i + 1).padStart(2, '0')}</span>
             <p>{t}</p>
           </li>
         ))}
       </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">最近の学生の研究テーマ<span class="en">Student Themes</span></h2>
+      <ul class="student-themes" role="list">
+        {research.student_themes.map((t) => <li>{t}</li>)}
+      </ul>
       <p class="note theme-note">
-        上記は過去に取り組まれたテーマの一例です。
+        学生それぞれの関心に応じて、幅広いテーマに取り組んでいます。
       </p>
     </div>
   </section>
@@ -38,7 +47,7 @@ import { research } from '../lib/content';
 
 <style>
   .theme-grid {
-    list-style: none; margin: 0 0 1.5rem; padding: 0;
+    list-style: none; margin: 0; padding: 0;
     display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule);
   }
   @media (min-width: 44rem) { .theme-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -51,5 +60,12 @@ import { research } from '../lib/content';
     color: var(--teal-600); flex: none;
   }
   .theme-grid p { margin: 0; font-size: .95rem; font-weight: 500; color: var(--navy-900); }
+
+  .student-themes { list-style: none; margin: 0 0 1.5rem; padding: 0; }
+  .student-themes li {
+    border-left: 3px solid var(--teal-600); background: var(--tint);
+    padding: .9rem 1.1rem; font-size: .92rem; color: var(--navy-900);
+  }
+  .student-themes li + li { margin-top: .6rem; }
   .theme-note { max-width: var(--text-w); }
 </style>

@@ -13,9 +13,9 @@ function load<T>(filename: string): T {
 }
 
 export type Site = {
-  lab: { name_ja: string; name_en: string; short_name: string };
+  lab: { name_ja: string; name_en: string };
   professor: {
-    name_ja: string; name_kana: string; name_en: string;
+    name_ja: string; name_kana: string;
     title: string; affiliation: string; profile: string;
     links: { researchmap: string; university: string };
   };
@@ -33,7 +33,8 @@ export type Research = {
   introduction: string[];
   fields: string[];
   approach: { step: number; title: string; body: string }[];
-  past_themes: string[];
+  themes: string[];
+  student_themes: string[];
 };
 
 export type Members = {
@@ -42,13 +43,12 @@ export type Members = {
 };
 
 export type Career = {
-  policy: string;
   categories: string[];
   note: string;
 };
 
 export type Publications = {
-  faculty: { policy: string; researchmap: string };
+  faculty: { researchmap: string };
   students: { year: number; type: string; authors: string;
               title: string; venue: string; url: string }[] | null;
 };

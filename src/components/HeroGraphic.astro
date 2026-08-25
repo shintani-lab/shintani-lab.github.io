@@ -46,7 +46,7 @@ const links: [{ x: number; y: number }, { x: number; y: number }][] = [
   class="hero-graphic"
   viewBox="0 0 640 460"
   role="img"
-  aria-label="ことば・認知・データが結びつくイメージ図"
+  aria-label={`ことば・認知・データが結びつくイメージ図。${words.join('、')}という言葉が線でつながっています。`}
 >
   <defs>
     <radialGradient id="hero-glow" cx="50%" cy="50%" r="50%">
@@ -69,7 +69,7 @@ const links: [{ x: number; y: number }, { x: number; y: number }][] = [
     {nodes.map((n) => <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} />)}
   </g>
 
-  <g class="labels" text-anchor="middle">
+  <g class="labels" text-anchor="middle" aria-hidden="true">
     {nodes.map((n, i) =>
       words[i] ? (
         <text x={n.x} y={n.place === 'above' ? n.y - n.r - 10 : n.y + n.r + 24}>

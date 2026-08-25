@@ -3,7 +3,10 @@ import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
 import { site, students } from '../lib/content';
 ---
-<Base title="メンバー" description="研究室のメンバーを紹介します。">
+<Base
+  title="メンバー"
+  description="芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）のメンバーです。教員の新谷真由と、在籍する学生の学年・研究テーマをご紹介します。"
+>
   <PageHead title="メンバー" en="Members" />
 
   <!-- 教員 -->
@@ -21,7 +24,7 @@ import { site, students } from '../lib/content';
         {site.professor.profile && (
           <p class="faculty-profile">{site.professor.profile}</p>
         )}
-        <ul class="faculty-links">
+        <ul class="faculty-links" role="list">
           <li>
             <a href={site.professor.links.researchmap} target="_blank" rel="noopener">
               researchmap
@@ -47,7 +50,7 @@ import { site, students } from '../lib/content';
           現在、掲載準備中です。
         </p>
       ) : (
-        <ul class="student-list">
+        <ul class="student-list" role="list">
           {students.map((s) => (
             <li>
               <span class="grade">{s.grade}</span>

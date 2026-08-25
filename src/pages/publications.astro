@@ -12,7 +12,10 @@ for (const p of studentPublications) {
 }
 const years = [...byYear.keys()].sort((a, b) => b - a);
 ---
-<Base title="業績" description="研究室の研究業績を掲載しています。">
+<Base
+  title="業績"
+  description="芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）の研究業績です。教員の業績はresearchmapに、学生の学会発表・論文・受賞は本ページに掲載しています。"
+>
   <PageHead title="業績" en="Publications" />
 
   <!-- 教員 -->
@@ -20,7 +23,7 @@ const years = [...byYear.keys()].sort((a, b) => b - a);
     <div class="container">
       <h2 class="section-title">教員の業績<span class="en">Faculty</span></h2>
       <p class="prose">
-        {site.professor.name_ja}の研究業績は researchmap にまとめています。
+        教員の研究業績は researchmap にまとめています。
         最新の情報はそちらをご覧ください。
       </p>
       <a class="btn" href={publications.faculty.researchmap} target="_blank" rel="noopener">

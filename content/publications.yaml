@@ -4,7 +4,8 @@
 #   ・学生の業績 → 研究室HPに個別掲載（情報は後日提供）
 
 faculty:
-  policy: researchmap へのリンクのみ
+  # （policy は打合せの記録用で、サイトには表示されません）
+  # policy: researchmap へのリンクのみ
   researchmap: https://researchmap.jp/mayushintani
 
 students:

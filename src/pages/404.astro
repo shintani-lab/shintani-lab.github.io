@@ -14,7 +14,7 @@ import { nav } from '../lib/content';
         お探しのページは、移動または削除された可能性があります。
         お手数ですが、下のリンクからお探しください。
       </p>
-      <ul class="page-links">
+      <ul class="page-links" role="list">
         {nav.map((item) => (
           <li><a href={item.href}>{item.label}</a></li>
         ))}

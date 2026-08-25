@@ -14,9 +14,9 @@
 
 ```
 .
-├── content/                サイトに載る文章・データ（更新はここだけ）
+├── content/                サイトに載る文章・データ（更新の大半はここ）
 │   ├── site.yaml               研究室名・教員情報・連絡先・所在地・説明文
-│   ├── research.yaml           紹介文・研究分野・テーマ例
+│   ├── research.yaml           紹介文・研究分野・研究テーマ
 │   ├── members.yaml            学生メンバー（教員は site.yaml 側）
 │   ├── career.yaml             卒業後の進路
 │   ├── publications.yaml       業績

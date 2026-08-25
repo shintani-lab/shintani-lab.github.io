@@ -12,8 +12,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 const { item } = Astro.props;
 const { Content } = await render(item);
+
+// 検索結果に出る説明文。本文の書き出しを使い、無ければ記事タイトルを使います。
+const excerpt = (item.body ?? '')
+  .replace(/[#*>[]()_`-]/g, '')
+  .replace(/s+/g, ' ')
+  .trim()
+  .slice(0, 100);
+const description = excerpt || item.data.title;
 ---
-<Base title={item.data.title} description={item.data.title}>
+<Base title={item.data.title} description={description}>
   <article class="section">
     <div class="container">
       <div class="article">

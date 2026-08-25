@@ -55,7 +55,7 @@ const stepIcons: Record<number, string> = {
   <section class="section section--tint">
     <div class="container">
       <h2 class="section-title">研究のアプローチ<span class="en">Approach</span></h2>
-      <ol class="approach">
+      <ol class="approach" role="list">
         {research.approach.map((a) => (
           <li>
             <div class="approach-head">
@@ -76,7 +76,7 @@ const stepIcons: Record<number, string> = {
   <section class="section">
     <div class="container">
       <h2 class="section-title">研究分野<span class="en">Fields</span></h2>
-      <ul class="fields">
+      <ul class="fields" role="list">
         {research.fields.map((f) => (
           <li>
             <Icon name={iconForField(f)} size={22} />
@@ -93,11 +93,13 @@ const stepIcons: Record<number, string> = {
   <!-- News -->
   <section class="section section--tint">
     <div class="container">
-      <h2 class="section-title">
-        News<span class="en">お知らせ</span>
-        {allNews.length > 3 && <a class="section-more" href="/news/">一覧を見る →</a>}
-      </h2>
+      <h2 class="section-title">News<span class="en">お知らせ</span></h2>
       <NewsList items={latestNews} />
+      {allNews.length > 0 && (
+        <p class="news-more">
+          <a href="/news/">News 一覧を見る<span aria-hidden="true"> →</span></a>
+        </p>
+      )}
     </div>
   </section>
 </Base>
@@ -203,7 +205,6 @@ const stepIcons: Record<number, string> = {
   .fields-note { max-width: var(--text-w); }
 
   /* News の「一覧を見る」 */
-  .section-title .section-more {
-    margin-left: auto; font-size: .8rem; font-weight: 500; text-decoration: none;
-  }
+  .news-more { margin: 1.5rem 0 0; }
+  .news-more a { font-size: .9rem; font-weight: 500; }
 </style>

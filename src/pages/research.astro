@@ -19,7 +19,7 @@ import { iconForField } from '../lib/icons';
   <section class="section section--tint">
     <div class="container">
       <h2 class="section-title">研究分野<span class="en">Fields</span></h2>
-      <ul class="field-list">
+      <ul class="field-list" role="list">
         {research.fields.map((f) => (
           <li>
             <Icon name={iconForField(f)} size={22} />
@@ -63,7 +63,7 @@ import { iconForField } from '../lib/icons';
     <div class="container">
       <h2 class="section-title">教員の研究業績<span class="en">Publications</span></h2>
       <p class="prose">
-        {site.professor.name_ja}の研究業績は researchmap に掲載しています。
+        教員の研究業績は researchmap に掲載しています。
       </p>
       <a class="btn" href={site.professor.links.researchmap} target="_blank" rel="noopener">
         researchmap で業績を見る
