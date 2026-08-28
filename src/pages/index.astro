@@ -29,6 +29,9 @@ const stepIcons: Record<number, string> = {
       <div class="hero-head">
         <p class="hero-id">
           <span class="hero-univ">{site.professor.affiliation}</span>
+          {site.professor.affiliation_lines?.map((line) => (
+            <span class="hero-affil">{line}</span>
+          ))}
           <span class="hero-lab">{site.lab.name_ja}</span>
           <span class="hero-en">{site.lab.name_en}</span>
         </p>
@@ -42,7 +45,7 @@ const stepIcons: Record<number, string> = {
       </div>
 
       <div class="hero-body">
-        <p class="hero-lead">{research.introduction[0]}</p>
+        <p class="hero-lead">{research.lead_top}</p>
         <div class="hero-actions">
           <a class="btn" href="/research/">研究内容を見る</a>
           <a class="btn btn--ghost" href="/join/">配属を考えている方へ</a>
@@ -133,8 +136,13 @@ const stepIcons: Record<number, string> = {
   .hero-id { margin: 0 0 1.5rem; }
   .hero-univ {
     display: block; font-size: .8rem; color: var(--muted);
-    letter-spacing: .02em; margin-bottom: .35rem;
+    letter-spacing: .02em;
   }
+  .hero-affil {
+    display: block; font-size: .72rem; color: var(--muted);
+    letter-spacing: .02em; line-height: 1.7;
+  }
+  .hero-affil:last-of-type { margin-bottom: .5rem; }
   .hero-lab {
     display: block; font-size: 1.05rem; font-weight: 700; color: var(--navy-900);
     line-height: 1.5; padding-left: .75rem; border-left: 3px solid var(--teal-600);

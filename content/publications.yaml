@@ -1,7 +1,13 @@
 # 研究成果
 # 【方針確定】2026-08-24 新谷先生より：
 #   ・教員の業績 → researchmap へのリンク掲載のみ（HP側では管理しない）
-#   ・学生の業績 → 研究室HPに個別掲載（情報は後日提供）
+#   ・学生の業績 → 研究室HPに個別掲載
+#
+# ● 追加のしかた
+#   下の students: の下に、同じ形で足してください。
+#   year は 2026 のように数字だけを書きます（並び順に使うため）。
+#   type はそのままタグとして表示されます。「査読付き論文 / 研究発表 / 受賞」など。
+#   url が無いときは url: "" にしてください。
 
 faculty:
   # （policy は打合せの記録用で、サイトには表示されません）
@@ -9,12 +15,34 @@ faculty:
   researchmap: https://researchmap.jp/mayushintani
 
 students:
-  # 後日、先生より情報を受領して記入する。
-  # 例（テンプレート）:
-  # - year: 2025
-  #   type: 学会発表        # 学会発表 / 論文 / 受賞
-  #   authors: 
-  #   title: 
-  #   venue: 
-  #   url: 
-  []
+  # 【提供】2026-08-25 新谷先生より
+  - year: 2025
+    type: 査読付き論文
+    authors: Ryosei Ooki, Mayu Shintani, Sumito Nagasawa, and Fumiya Yonemitsu
+    title: "Dimensions of Perceived Humanness in Artificial Faces: Evaluating Anatomical and Affective Impressions in the Uncanny Valley"
+    venue: Procedia Computer Science, Vol. 270, pp. 5157–5166, November 6, 2025.
+    url: https://doi.org/10.1016/j.procs.2025.09.643
+  - year: 2025
+    type: 研究発表
+    authors: Dayu Wu and Mayu Shintani
+    title: "Chinese–Japanese Code-Switching among Chinese Residents in Japan: Individual and Psychological Factors"
+    venue: The IEEE ProComm Japan 2025 Workshop、2025年12月15日
+    url: ""
+  - year: 2025
+    type: 研究発表
+    authors: 新谷真由・大木涼生
+    title: 人工顔の人間らしさの知覚―心理測定尺度と言語による印象構造の分析―
+    venue: 東北大学 言語変化・変異研究ユニット 2025年第2回研究会、2025年11月29日
+    url: ""
+  - year: 2025
+    type: 研究発表
+    authors: Ryosei Ooki, Mayu Shintani, Sumito Nagasawa, and Fumiya Yonemitsu
+    title: "Dimensions of Perceived Humanness in Artificial Faces: Evaluating Anatomical and Affective Impressions in the Uncanny Valley"
+    venue: 29th International Conference on Knowledge-Based and Intelligent Information & Engineering Systems（KES 2025）、Osaka, Japan、2025年9月12日
+    url: ""
+  - year: 2024
+    type: 研究発表
+    authors: Ryosei Ooki and Mayu Shintani
+    title: "Investigation of the Cause of the Uncanny Valley in Human Faces"
+    venue: The IEEE ProComm Japan 2024 Workshop、2024年12月16日
+    url: ""

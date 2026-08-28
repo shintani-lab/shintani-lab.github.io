@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
 import Icon from '../components/Icon.astro';
-import { site, research, career } from '../lib/content';
+import { site, research, career, join } from '../lib/content';
 import { iconForField } from '../lib/icons';
 ---
 <Base
@@ -39,6 +39,17 @@ import { iconForField } from '../lib/icons';
 
   <section class="section">
     <div class="container">
+      <h2 class="section-title">ゼミ実施日<span class="en">Weekly Seminar Schedule</span></h2>
+      <p class="prose">{join.seminar.intro}</p>
+      <ul class="slot-list" role="list">
+        {join.seminar.slots.map((s) => <li>{s}</li>)}
+      </ul>
+      <p class="note slot-note">{join.seminar.note}</p>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
       <h2 class="section-title">卒業後の進路<span class="en">Career</span></h2>
       <ul class="career-list">
         {career.categories.map((c) => <li>{c}</li>)}
@@ -47,11 +58,11 @@ import { iconForField } from '../lib/icons';
     </div>
   </section>
 
-  <section class="section section--tint">
+  <section class="section">
     <div class="container">
       <h2 class="section-title">お問い合わせ<span class="en">Contact</span></h2>
       <p class="prose">
-        研究室の見学や、研究内容についてのご質問を歓迎しています。
+        ゼミの見学や、研究内容についてのご質問を歓迎しています。
         まずはお気軽にご連絡ください。
       </p>
       <div class="join-actions">
@@ -87,5 +98,13 @@ import { iconForField } from '../lib/icons';
     border: 1px solid var(--rule);
   }
   .skill-note, .career-note { max-width: var(--text-w); }
+
+  .slot-list { list-style: none; margin: 1.25rem 0 0; padding: 0; max-width: var(--text-w); }
+  .slot-list li {
+    border-left: 3px solid var(--teal-600); background: var(--tint);
+    padding: .8rem 1.1rem; font-size: .92rem; color: var(--navy-900);
+  }
+  .slot-list li + li { margin-top: .5rem; }
+  .slot-note { margin-top: 1.25rem; max-width: var(--text-w); }
   .join-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
 </style>

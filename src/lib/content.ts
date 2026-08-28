@@ -16,7 +16,10 @@ export type Site = {
   lab: { name_ja: string; name_en: string };
   professor: {
     name_ja: string; name_kana: string;
-    title: string; affiliation: string; profile: string;
+    title: string; affiliation: string;
+    affiliation_lines: string[];
+    profile: string;
+    profile_extra: { label: string; body: string }[] | null;
     links: { researchmap: string; university: string };
   };
   location: {
@@ -30,6 +33,7 @@ export type Site = {
 };
 
 export type Research = {
+  lead_top: string;
   introduction: string[];
   fields: string[];
   approach: { step: number; title: string; body: string }[];
@@ -39,12 +43,16 @@ export type Research = {
 
 export type Members = {
   // 教員の情報は site.yaml で管理しています。
-  students: { grade: string; theme: string; name?: string }[] | null;
+  students: { grade: string; name?: string; theme?: string }[] | null;
 };
 
 export type Career = {
   categories: string[];
   note: string;
+};
+
+export type Join = {
+  seminar: { intro: string; slots: string[]; note: string };
 };
 
 export type Publications = {
@@ -58,9 +66,22 @@ export const research = load<Research>('research.yaml');
 export const members = load<Members>('members.yaml');
 export const career = load<Career>('career.yaml');
 export const publications = load<Publications>('publications.yaml');
+export const join = load<Join>('join.yaml');
 
 // 空リストが null として読み込まれることがあるため、配列に正規化します。
 export const students = members.students ?? [];
+export const professorExtra = site.professor.profile_extra ?? [];
+
+// 学生を学年ごとにまとめます（YAMLに書いた順序を保ちます）。
+export const studentsByGrade = students.reduce<{ grade: string; list: typeof students }[]>(
+  (acc, s) => {
+    const found = acc.find((g) => g.grade === s.grade);
+    if (found) found.list.push(s);
+    else acc.push({ grade: s.grade, list: [s] });
+    return acc;
+  },
+  []
+);
 export const studentPublications = publications.students ?? [];
 
 // サイト全体のナビゲーション。ここが唯一の定義箇所です。
