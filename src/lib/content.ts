@@ -40,6 +40,13 @@ export type Research = {
   approach: { step: number; title: string; body: string }[];
   themes: string[];
   student_themes: string[];
+  // 研究内容ページの図（データ分析の工程）
+  pipeline: {
+    box: string;
+    detail?: string;
+    chips?: string[];
+    arrow?: string;
+  }[] | null;
 };
 
 export type Members = {

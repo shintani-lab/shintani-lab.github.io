@@ -1,0 +1,90 @@
+---
+// 研究内容ページに出す「データ分析の工程」の図（フローチャート）です。
+// 中身は content/research.yaml の pipeline で書き換えられます。
+// 四角＝そのときのデータの姿、矢印＝そこで使う手法、という読み方の図です。
+import { research } from '../lib/content';
+
+const steps = research.pipeline ?? [];
+---
+<figure class="flow-figure">
+  <figcaption class="flow-caption">データ分析の工程</figcaption>
+
+  <div class="flow">
+    {steps.map((step, i) => (
+      <>
+        <div class="node">
+          <h3>{step.box}</h3>
+          {step.detail && <p>{step.detail}</p>}
+          {step.chips && (
+            <ul class="chips" role="list">
+              {step.chips.map((c) => <li>{c}</li>)}
+            </ul>
+          )}
+        </div>
+
+        {step.arrow && (
+          <div class="edge">
+            <span class="edge-line" aria-hidden="true"></span>
+            <span class="edge-label">{step.arrow}</span>
+            <span class="edge-line edge-line--arrow" aria-hidden="true"></span>
+          </div>
+        )}
+      </>
+    ))}
+  </div>
+</figure>
+
+<style>
+  .flow-figure {
+    margin: 0; padding: 1.75rem 1.5rem;
+    background: var(--tint); border: 1px solid var(--rule);
+  }
+  .flow-caption {
+    font-size: .72rem; font-weight: 500; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--teal-600); margin-bottom: 1.25rem;
+  }
+
+  /* ---- 四角（データの姿） ---- */
+  .node {
+    background: var(--paper); border: 1px solid var(--rule);
+    border-top: 3px solid var(--navy-900);
+    padding: .9rem 1.1rem; text-align: center;
+  }
+  .node h3 { font-size: .95rem; font-weight: 700; margin: 0; }
+  .node p {
+    margin: .35rem 0 0; font-size: .78rem; color: var(--muted); line-height: 1.7;
+  }
+
+  /* 最初と最後の四角は色を変えて、入口と出口が分かるようにします */
+  .flow > .node:first-child { border-top-color: #0f7a72; }
+  .flow > .node:last-child  { border-top-color: #6f6fb0; }
+
+  .chips {
+    list-style: none; margin: .6rem 0 0; padding: 0;
+    display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center;
+  }
+  .chips li {
+    font-size: .72rem; font-weight: 500; border-radius: 2px;
+    background: var(--teal-050); color: var(--teal-600); padding: .2em .6em;
+  }
+
+  /* ---- 矢印（そこで使う手法） ---- */
+  .edge {
+    display: flex; flex-direction: column; align-items: center;
+    padding: .55rem 0; gap: .35rem;
+  }
+  .edge-line { width: 2px; height: .8rem; background: #a8b6c8; }
+  .edge-line--arrow { position: relative; }
+  /* 矢印の先端 */
+  .edge-line--arrow::after {
+    content: ""; position: absolute; left: 50%; bottom: -.45rem;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #a8b6c8;
+  }
+  .edge-label {
+    font-size: .75rem; font-weight: 500; color: var(--teal-600);
+    text-align: center; line-height: 1.6; max-width: 18rem;
+  }
+</style>
