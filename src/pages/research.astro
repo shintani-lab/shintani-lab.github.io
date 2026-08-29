@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
 import Icon from '../components/Icon.astro';
+import ProcessFlow from '../components/ProcessFlow.astro';
 import { site, research } from '../lib/content';
 import { iconForField } from '../lib/icons';
 ---
@@ -9,10 +10,11 @@ import { iconForField } from '../lib/icons';
   <PageHead title="研究内容" en="Research" />
 
   <section class="section">
-    <div class="container">
+    <div class="container intro-grid">
       <div class="prose lead">
         {research.introduction.map((p) => <p>{p}</p>)}
       </div>
+      <ProcessFlow />
     </div>
   </section>
 
@@ -73,6 +75,12 @@ import { iconForField } from '../lib/icons';
 </Base>
 
 <style>
+  /* 紹介文（左）と分析の流れの図（右）。狭い画面では縦に並びます */
+  .intro-grid { display: grid; gap: 2.5rem; align-items: start; }
+  @media (min-width: 64rem) {
+    .intro-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 3rem; }
+  }
+
   .field-list {
     list-style: none; margin: 0; padding: 0;
     display: grid; gap: .75rem;

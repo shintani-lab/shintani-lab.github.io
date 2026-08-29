@@ -45,10 +45,46 @@ import { iconForField } from '../lib/icons';
         {join.seminar.slots.map((s) => <li>{s}</li>)}
       </ul>
       <p class="note slot-note">{join.seminar.note}</p>
+
+      {join.photos && join.photos.length > 0 && (
+        <div class="photo-grid">
+          {join.photos.map((photo) => (
+            <figure class="photo">
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                width={photo.width}
+                height={photo.height}
+                loading="lazy"
+              />
+              <figcaption>{photo.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
     </div>
   </section>
 
   <section class="section section--tint">
+    <div class="container">
+      <h2 class="section-title">
+        大学院進学・留学生の方へ<span class="en">Graduate &amp; International</span>
+      </h2>
+      <dl class="admission">
+        {(join.admission ?? []).map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>{item.body}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="note admission-note">
+        ご相談は <a href="/contact/">連絡先ページ</a>のメールアドレスまでお願いします。
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="container">
       <h2 class="section-title">卒業後の進路<span class="en">Career</span></h2>
       <ul class="career-list">
@@ -58,7 +94,7 @@ import { iconForField } from '../lib/icons';
     </div>
   </section>
 
-  <section class="section">
+  <section class="section section--tint">
     <div class="container">
       <h2 class="section-title">お問い合わせ<span class="en">Contact</span></h2>
       <p class="prose">
@@ -106,5 +142,25 @@ import { iconForField } from '../lib/icons';
   }
   .slot-list li + li { margin-top: .5rem; }
   .slot-note { margin-top: 1.25rem; max-width: var(--text-w); }
+
+  .photo-grid { display: grid; gap: 1.5rem; margin-top: 2rem; }
+  @media (min-width: 44rem) { .photo-grid { grid-template-columns: repeat(2, 1fr); } }
+  .photo { margin: 0; }
+  .photo img {
+    width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover;
+    border: 1px solid var(--rule); background: var(--tint);
+  }
+  .photo figcaption {
+    margin-top: .7rem; font-size: .82rem; color: var(--muted); line-height: 1.8;
+  }
+
+  .admission { margin: 0; max-width: var(--text-w); }
+  .admission > div { padding: 1.1rem 0; border-top: 1px solid var(--rule); }
+  .admission > div:last-child { border-bottom: 1px solid var(--rule); }
+  .admission dt {
+    font-size: .9rem; font-weight: 700; color: var(--navy-900); margin-bottom: .4rem;
+  }
+  .admission dd { margin: 0; font-size: .92rem; }
+  .admission-note { margin-top: 1.25rem; max-width: var(--text-w); }
   .join-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
 </style>

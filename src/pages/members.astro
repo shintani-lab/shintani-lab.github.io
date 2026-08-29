@@ -14,6 +14,7 @@ import { site, students, studentsByGrade, professorExtra } from '../lib/content'
     <div class="container">
       <h2 class="section-title">教員<span class="en">Faculty</span></h2>
       <div class="faculty">
+        <div class="faculty-body">
         <p class="faculty-name">
           {site.professor.name_ja}
           <span class="faculty-kana">{site.professor.name_kana}</span>
@@ -49,6 +50,17 @@ import { site, students, studentsByGrade, professorExtra } from '../lib/content'
             </a>
           </li>
         </ul>
+        </div>
+
+        {site.professor.photo && (
+          <img
+            class="faculty-photo"
+            src={site.professor.photo}
+            alt={site.professor.photo_alt}
+            width="900"
+            height="1200"
+          />
+        )}
       </div>
     </div>
   </section>
@@ -82,7 +94,16 @@ import { site, students, studentsByGrade, professorExtra } from '../lib/content'
 </Base>
 
 <style>
-  .faculty { max-width: var(--text-w); }
+  .faculty { display: grid; gap: 2rem; }
+  .faculty-body { max-width: var(--text-w); }
+  /* 広い画面では文章の右に写真を並べます */
+  @media (min-width: 48rem) {
+    .faculty { grid-template-columns: minmax(0, 1fr) 15rem; gap: 2.5rem; align-items: start; }
+  }
+  .faculty-photo {
+    width: 100%; max-width: 15rem; height: auto;
+    border: 1px solid var(--rule);
+  }
   .faculty-name {
     font-size: 1.35rem; font-weight: 700; color: var(--navy-900);
     margin: 0 0 .3rem; display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap;

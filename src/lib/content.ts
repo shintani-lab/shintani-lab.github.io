@@ -18,6 +18,7 @@ export type Site = {
     name_ja: string; name_kana: string;
     title: string; affiliation: string;
     affiliation_lines: string[];
+    photo: string; photo_alt: string;
     profile: string;
     profile_extra: { label: string; body: string }[] | null;
     links: { researchmap: string; university: string };
@@ -53,6 +54,8 @@ export type Career = {
 
 export type Join = {
   seminar: { intro: string; slots: string[]; note: string };
+  admission: { label: string; body: string }[] | null;
+  photos: { src: string; width: number; height: number; alt: string; caption: string }[] | null;
 };
 
 export type Publications = {

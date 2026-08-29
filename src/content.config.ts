@@ -13,6 +13,9 @@ const news = defineCollection({
     //   サイト全体が公開できなくなるため、あえて緩くしています）
     category: z.string(),
     title: z.string(),
+    // 「2026年7月末」のように日付を特定しないで見せたいときに使います。
+    // 書かなければ date がそのまま表示されます。並び順は必ず date で決まります。
+    date_label: z.string().optional(),
     draft: z.boolean().default(false),
   }),
 });
