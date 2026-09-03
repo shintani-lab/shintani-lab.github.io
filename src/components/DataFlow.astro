@@ -8,9 +8,7 @@ const steps = research.pipeline ?? [];
 ---
 {steps.length > 0 && (
 <figure class="flow-figure">
-  <figcaption class="flow-caption">
-    データ分析の工程（四角＝そのときのデータの姿、間の文字＝そこで行うこと）
-  </figcaption>
+  <figcaption class="flow-caption">データ分析の工程</figcaption>
 
   <div class="flow">
     {steps.map((step, i) => (

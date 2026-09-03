@@ -28,7 +28,6 @@
 │   ├── pages/                  各ページ＋404・sitemap.xml
 │   ├── styles/global.css       色・文字・余白の設定
 │   └── lib/                    content/ の読み込み・日付整形など
-├── docs/                   打合せ資料
 └── .github/workflows/      push すると自動で公開される設定
 ```
 
