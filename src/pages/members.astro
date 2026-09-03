@@ -15,10 +15,10 @@ import { site, students, studentsByGrade, professorExtra } from '../lib/content'
       <h2 class="section-title">教員<span class="en">Faculty</span></h2>
       <div class="faculty">
         <div class="faculty-body">
-        <p class="faculty-name">
+        <h3 class="faculty-name">
           {site.professor.name_ja}
           <span class="faculty-kana">{site.professor.name_kana}</span>
-        </p>
+        </h3>
         <p class="faculty-title">
           {site.professor.affiliation}　{site.professor.title}
         </p>
@@ -56,9 +56,9 @@ import { site, students, studentsByGrade, professorExtra } from '../lib/content'
           <img
             class="faculty-photo"
             src={site.professor.photo}
-            alt={site.professor.photo_alt}
-            width="900"
-            height="1200"
+            alt={site.professor.photo_alt || site.professor.name_ja}
+            width={site.professor.photo_width}
+            height={site.professor.photo_height}
           />
         )}
       </div>
@@ -76,11 +76,11 @@ import { site, students, studentsByGrade, professorExtra } from '../lib/content'
         <div class="grades">
           {studentsByGrade.map((group) => (
             <div class="grade-block">
-              <h3 class="grade-name">{group.grade}</h3>
+              <h3 class="grade-name">{group.grade ?? '（学年未記入）'}</h3>
               <ul class="student-list" role="list">
                 {group.list.map((s) => (
                   <li>
-                    <span class="student-name">{s.name}</span>
+                    <span class="student-name">{s.name ?? '（氏名未記入）'}</span>
                     {s.theme && <span class="student-theme">{s.theme}</span>}
                   </li>
                 ))}

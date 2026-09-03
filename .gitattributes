@@ -3,3 +3,4 @@
 #   「全行が変更された」ような差分にならないようにするための設定です）
 * text=auto eol=lf
 *.png binary
+*.jpg binary

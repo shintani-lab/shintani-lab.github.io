@@ -15,11 +15,14 @@ const { Content } = await render(item);
 
 // 検索結果に出る説明文。本文の書き出しを使い、無ければ記事タイトルを使います。
 const excerpt = (item.body ?? '')
-  .replace(/[#*>[]()_`-]/g, '')
-  .replace(/s+/g, ' ')
+  .replace(/[#*>\[\]()_\x60\-]/g, '')
+  // 日本語は改行位置に空白が入らないよう、改行はそのまま詰めます
+  .replace(/\s*\n\s*/g, '')
+  .replace(/[ \t]+/g, ' ')
   .trim()
   .slice(0, 100);
-const description = excerpt || item.data.title;
+const description =
+  (excerpt || item.data.title) + '（芝浦工業大学 認知言語学・言語データ分析研究室のお知らせ）';
 ---
 <Base title={item.data.title} description={description}>
   <article class="section">

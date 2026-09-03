@@ -14,7 +14,7 @@ import { iconForField } from '../lib/icons';
   <section class="section">
     <div class="container">
       <div class="prose lead">
-        <p>{research.introduction[2]}</p>
+        <p>{research.introduction[2] ?? research.introduction[0]}</p>
       </div>
     </div>
   </section>
@@ -87,7 +87,7 @@ import { iconForField } from '../lib/icons';
   <section class="section">
     <div class="container">
       <h2 class="section-title">卒業後の進路<span class="en">Career</span></h2>
-      <ul class="career-list">
+      <ul class="career-list" role="list">
         {career.categories.map((c) => <li>{c}</li>)}
       </ul>
       <p class="note career-note">{career.note}</p>
@@ -143,11 +143,11 @@ import { iconForField } from '../lib/icons';
   .slot-list li + li { margin-top: .5rem; }
   .slot-note { margin-top: 1.25rem; max-width: var(--text-w); }
 
-  .photo-grid { display: grid; gap: 1.5rem; margin-top: 2rem; }
+  .photo-grid { display: grid; gap: 1.5rem; margin-top: 2rem; align-items: start; }
   @media (min-width: 44rem) { .photo-grid { grid-template-columns: repeat(2, 1fr); } }
   .photo { margin: 0; }
   .photo img {
-    width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover;
+    width: 100%; height: auto;
     border: 1px solid var(--rule); background: var(--tint);
   }
   .photo figcaption {

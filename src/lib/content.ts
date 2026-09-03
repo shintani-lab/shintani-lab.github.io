@@ -18,7 +18,7 @@ export type Site = {
     name_ja: string; name_kana: string;
     title: string; affiliation: string;
     affiliation_lines: string[];
-    photo: string; photo_alt: string;
+    photo: string; photo_width: number; photo_height: number; photo_alt: string;
     profile: string;
     profile_extra: { label: string; body: string }[] | null;
     links: { researchmap: string; university: string };

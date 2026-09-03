@@ -43,7 +43,7 @@ const years = [...byYear.keys()].sort((a, b) => b - a);
         years.map((year) => (
           <div class="year-block">
             <h3 class="year">{year}年</h3>
-            <ul class="pub-list">
+            <ul class="pub-list" role="list">
               {byYear.get(year)!.map((p) => (
                 <li>
                   <span class="tag">{p.type}</span>

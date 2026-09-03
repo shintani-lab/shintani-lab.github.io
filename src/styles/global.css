@@ -41,7 +41,7 @@ body {
   background: var(--paper);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.9;
   font-feature-settings: "palt" 1;
   -webkit-font-smoothing: antialiased;
@@ -95,7 +95,7 @@ h1, h2, h3, h4 { color: var(--navy-900); line-height: 1.5; text-wrap: balance; m
   background: var(--teal-050); color: var(--teal-600);
 }
 .lead { font-size: 1.05rem; color: var(--text); }
-.note { font-size: .85rem; color: var(--muted); }
+.note { font-size: .9rem; color: var(--muted); }
 
 .card-grid { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
 .card-grid > * { background: var(--paper); padding: 1.5rem 1.4rem; }

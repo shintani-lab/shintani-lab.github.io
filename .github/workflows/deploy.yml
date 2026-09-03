@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false   # 公開処理の途中で打ち切られないようにします
 
 jobs:
   build:
@@ -23,6 +23,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
+          # Node.js 22 のサポート期限は2027年春です。
+          # それ以降にビルドが失敗したら、この数字を新しい偶数（24など）に上げてください。
           node-version: 22
           cache: npm
       - run: npm ci

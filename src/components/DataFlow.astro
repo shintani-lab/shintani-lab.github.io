@@ -6,14 +6,17 @@ import { research } from '../lib/content';
 
 const steps = research.pipeline ?? [];
 ---
+{steps.length > 0 && (
 <figure class="flow-figure">
-  <figcaption class="flow-caption">データ分析の工程</figcaption>
+  <figcaption class="flow-caption">
+    データ分析の工程（四角＝そのときのデータの姿、間の文字＝そこで行うこと）
+  </figcaption>
 
   <div class="flow">
     {steps.map((step, i) => (
       <>
         <div class="node">
-          <h3>{step.box}</h3>
+          <p class="node-title">{step.box}</p>
           {step.detail && <p>{step.detail}</p>}
           {step.chips && (
             <ul class="chips" role="list">
@@ -22,7 +25,7 @@ const steps = research.pipeline ?? [];
           )}
         </div>
 
-        {step.arrow && (
+        {step.arrow && i < steps.length - 1 && (
           <div class="edge">
             <span class="edge-line" aria-hidden="true"></span>
             <span class="edge-label">{step.arrow}</span>
@@ -33,6 +36,7 @@ const steps = research.pipeline ?? [];
     ))}
   </div>
 </figure>
+)}
 
 <style>
   .flow-figure {
@@ -50,7 +54,9 @@ const steps = research.pipeline ?? [];
     border-top: 3px solid var(--navy-900);
     padding: .9rem 1.1rem; text-align: center;
   }
-  .node h3 { font-size: .95rem; font-weight: 700; margin: 0; }
+  .node .node-title {
+    font-size: .95rem; font-weight: 700; margin: 0; color: var(--navy-900);
+  }
   .node p {
     margin: .35rem 0 0; font-size: .78rem; color: var(--muted); line-height: 1.7;
   }
@@ -64,7 +70,7 @@ const steps = research.pipeline ?? [];
     display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center;
   }
   .chips li {
-    font-size: .72rem; font-weight: 500; border-radius: 2px;
+    font-size: .78rem; font-weight: 500; border-radius: 2px;
     background: var(--teal-050); color: var(--teal-600); padding: .2em .6em;
   }
 
@@ -73,7 +79,7 @@ const steps = research.pipeline ?? [];
     display: flex; flex-direction: column; align-items: center;
     padding: .55rem 0; gap: .35rem;
   }
-  .edge-line { width: 2px; height: .8rem; background: #a8b6c8; }
+  .edge-line { width: 2px; height: .8rem; background: var(--muted); }
   .edge-line--arrow { position: relative; }
   /* 矢印の先端 */
   .edge-line--arrow::after {
@@ -81,7 +87,7 @@ const steps = research.pipeline ?? [];
     transform: translateX(-50%);
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 6px solid #a8b6c8;
+    border-top: 6px solid var(--muted);
   }
   .edge-label {
     font-size: .75rem; font-weight: 500; color: var(--teal-600);
