@@ -1,0 +1,443 @@
+---
+// 全ページ共通の骨組み：ヘッダー・フッター・共通の動き
+// メニューの項目は src/lib/data.ts の nav で管理しています。
+import { site, nav, url, isPreview, PRODUCTION_URL } from '../lib/data';
+import { POS } from '../lib/lang';
+import Arrow from '../components/Arrow.astro';
+import '../styles/gachi.css';
+
+interface Props {
+  title?: string;        // ページ名。省略するとトップページ扱い
+  description?: string;
+  dark?: boolean;        // 冒頭が暗い色のページ（トップ）
+  noindex?: boolean;     // 検索結果に出さないページ（404など）
+}
+const { title, description, dark = false, noindex = false } = Astro.props;
+
+const pageTitle = title ? `${title}｜${site.lab.name_ja}` : `${site.lab.name_ja}｜芝浦工業大学`;
+const desc = description ?? site.description;
+const current = Astro.url.pathname;
+const isCurrent = (href: string) => current.startsWith(href);
+const canonical = new URL(current, Astro.site);
+const ogImage = new URL(url('/ogp.png'), Astro.site);
+const year = new Date().getFullYear();
+const legend = ['noun', 'verb', 'particle', 'aux', 'suffix', 'symbol'] as const;
+
+// 比較用に /gachi/ で公開しているときは、検索結果に出さず、
+// 画面の隅に「現在のサイトの同じページ」へのボタンを出します。
+const hideFromSearch = noindex || isPreview;
+const barePath = current.slice(url('/').length - 1) || '/';
+const productionPage = new URL(
+  barePath.startsWith('/news/') ? '/news/' : barePath,
+  PRODUCTION_URL,
+).href;
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    {hideFromSearch && <meta name="robots" content="noindex" />}
+    {!hideFromSearch && <link rel="canonical" href={canonical} />}
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
+    <meta name="theme-color" content={dark ? '#0a0d1c' : '#fafaf6'} />
+
+    <!-- SNSやSlackにURLを貼ったときの表示（画像は public/ogp.png） -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.lab.name_ja} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={site.lab.name_ja} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=M+PLUS+1+Code:wght@400..700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"
+    />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body class:list={[dark && 'is-dark-top']}>
+    <a class="skip" href="#main">本文へスキップ</a>
+
+    <header class="header" data-header>
+      <div class="header-inner container">
+        <a class="brand" href={url('/')}>
+          <img class="brand-mark" src={url('/favicon.svg')} alt="" width="30" height="30" />
+          <span class="brand-text">
+            <span class="brand-ja">{site.lab.name_ja}</span>
+            <span class="brand-en en" lang="en">Shibaura Institute of Technology</span>
+          </span>
+        </a>
+
+        <nav class="nav" id="site-nav" aria-label="サイト内">
+          <ul class="nav-list" role="list">
+            {nav.map((n, i) => (
+              <li>
+                <a class:list={['nav-link', isCurrent(url(n.href)) && 'is-current']} href={url(n.href)}
+                   aria-current={isCurrent(url(n.href)) ? 'page' : undefined}>
+                  <span class="nav-num mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="nav-label">{n.label}</span>
+                  <span class="nav-en en" lang="en" aria-hidden="true">{n.en}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class:list={['nav-cta', isCurrent(url('/join/')) && 'is-current']} href={url('/join/')}>配属を検討している方へ</a>
+        </nav>
+
+        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" data-menu>
+          <span class="menu-bars" aria-hidden="true"><span></span><span></span></span>
+          <span class="menu-label">メニュー</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p class="footer-big" aria-hidden="true">{site.lab.name_ja}</p>
+        <div class="footer-grid">
+          <div>
+            <p class="footer-ja">{site.lab.name_ja}</p>
+            <p class="footer-en en" lang="en">{site.lab.name_en}</p>
+            <p class="footer-addr">
+              {site.professor.affiliation}　{site.professor.name_ja} {site.professor.title}<br />
+              ゼミ：{site.location.seminar.campus}　教員所属：{site.location.office.campus}
+            </p>
+          </div>
+          <ul class="footer-nav" role="list">
+            <li><a href={url('/')}>トップ</a></li>
+            {nav.map((n) => <li><a href={url(n.href)}>{n.label}</a></li>)}
+            <li><a href={url('/join/')}>配属を検討している方へ</a></li>
+          </ul>
+          <div class="footer-legend">
+            <p class="footer-legend-title">このサイトの色は、品詞を表しています</p>
+            <ul role="list">
+              {legend.map((k) => <li class={`pos-${k}`}><span></span>{POS[k]}</li>)}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <small class="en">© {year} {site.lab.name_en}</small>
+        <a href={site.professor.links.university} target="_blank" rel="noopener">芝浦工業大学 公式サイトの研究室ページ<Arrow kind="out" size={12} /></a>
+      </div>
+    </footer>
+
+    {isPreview && (
+      <aside class="preview" aria-label="比較用の案内">
+        <span class="preview-label">比較用の新デザイン</span>
+        <a class="preview-link" href={productionPage}>現在のサイトで見る<Arrow kind="out" size={12} /></a>
+      </aside>
+    )}
+
+    <script>
+      // ---- ヘッダー：少しスクロールしたら背景を付ける ----
+      const header = document.querySelector<HTMLElement>('[data-header]');
+      const onScroll = () => header?.classList.toggle('is-solid', window.scrollY > 24);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // ---- スマホ・タブレットのメニュー ----
+      const menuBtn = document.querySelector<HTMLButtonElement>('[data-menu]');
+      const setMenu = (open: boolean) => {
+        if (!header || !menuBtn) return;
+        header.classList.toggle('is-open', open);
+        menuBtn.setAttribute('aria-expanded', String(open));
+        document.documentElement.classList.toggle('menu-open', open);
+      };
+      menuBtn?.addEventListener('click', () => setMenu(!header?.classList.contains('is-open')));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && header?.classList.contains('is-open')) {
+          setMenu(false);
+          menuBtn?.focus();
+        }
+      });
+      window.matchMedia('(min-width: 72rem)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+
+      // ---- スクロールでふわっと表示 ----
+      const reveal = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('is-in');
+            reveal.unobserve(entry.target);
+          }
+        },
+        { rootMargin: '0px 0px -8% 0px' }
+      );
+      document.querySelectorAll('[data-reveal]').forEach((el) => reveal.observe(el));
+    </script>
+  </body>
+</html>
+
+<style>
+  /* ---------- ヘッダー ---------- */
+  .header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    color: var(--ink);
+    view-transition-name: site-header;
+    transition: background-color .4s, color .4s, box-shadow .4s;
+  }
+  .is-dark-top .header:not(.is-solid) { color: var(--on-night); }
+  .header.is-solid {
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    backdrop-filter: saturate(180%) blur(14px);
+    box-shadow: 0 1px 0 rgba(12, 15, 29, .08);
+  }
+  .header-inner {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    text-decoration: none;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .brand-mark { flex: none; border-radius: 8px; }
+  .brand-text { display: grid; line-height: 1.35; min-width: 0; }
+  .brand-ja { font-weight: 700; font-size: .92rem; letter-spacing: .04em; white-space: nowrap; }
+  .brand-en { font-size: .66rem; opacity: .7; white-space: nowrap; }
+  @media (max-width: 26rem) {
+    .brand-en { display: none; }
+    .brand-ja { font-size: .84rem; letter-spacing: .02em; }
+  }
+
+  .nav { display: flex; align-items: center; gap: 1.25rem; }
+  .nav-list { display: flex; gap: .15rem; }
+  .nav-link {
+    position: relative;
+    display: block;
+    padding: .5rem .65rem;
+    font-size: .88rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .nav-num, .nav-en { display: none; }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: .65rem;
+    right: .65rem;
+    bottom: .15rem;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--noun);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .45s var(--ease);
+  }
+  .nav-list li:nth-child(2) .nav-link::after { background: var(--verb); }
+  .nav-list li:nth-child(3) .nav-link::after { background: var(--particle); }
+  .nav-list li:nth-child(4) .nav-link::after { background: var(--aux); }
+  .nav-list li:nth-child(5) .nav-link::after { background: var(--suffix); }
+  .nav-list li:nth-child(6) .nav-link::after { background: var(--symbol); }
+  .nav-link:hover::after, .nav-link.is-current::after { transform: scaleX(1); }
+
+  .nav-cta {
+    padding: .55rem 1.1rem;
+    border-radius: 999px;
+    font-size: .84rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    background: var(--ink);
+    color: #fff;
+    transition: background-color .3s, color .3s;
+  }
+  .is-dark-top .header:not(.is-solid) .nav-cta { background: #fff; color: var(--ink); }
+  .nav-cta:hover, .nav-cta.is-current { background: var(--verb) !important; color: #fff !important; }
+
+  .menu-btn { display: none; }
+
+  /* ---- スマホ・タブレット：全画面メニュー ---- */
+  @media (max-width: 71.99rem) {
+    .menu-btn {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      height: 2.75rem;
+      padding: 0 .9rem;
+      border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+      border-radius: 999px;
+      background: none;
+      color: inherit;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .menu-label { white-space: nowrap; }
+    .menu-bars { display: grid; gap: 5px; width: 18px; }
+    .menu-bars span {
+      display: block;
+      height: 1.5px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform .35s var(--ease);
+    }
+    .is-open .menu-bars span:first-child { transform: translateY(3.25px) rotate(45deg); }
+    .is-open .menu-bars span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
+
+    .nav {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      gap: 2rem;
+      padding: calc(var(--header-h) + 1rem) var(--gutter) 2rem;
+      background: var(--night);
+      color: var(--on-night);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .35s, visibility .35s;
+      overflow-y: auto;
+    }
+    .is-open .nav { opacity: 1; visibility: visible; }
+    .header.is-open {
+      color: var(--on-night);
+      background: transparent;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    .nav-list { flex-direction: column; gap: 0; }
+    .nav-link {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr auto;
+      align-items: baseline;
+      font-size: 1.6rem;
+      font-weight: 900;
+      padding: .6rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+    .nav-num { display: block; font-size: .8rem; font-weight: 500; color: var(--on-night-muted); }
+    .nav-en { display: block; font-size: .78rem; font-weight: 500; color: var(--on-night-muted); }
+    .nav-link::after { left: 2.5rem; right: auto; width: 2rem; bottom: .35rem; }
+    .nav-cta {
+      align-self: flex-start;
+      padding: .9rem 1.5rem;
+      font-size: 1rem;
+      background: #fff;
+      color: var(--ink);
+    }
+  }
+  @media (max-width: 29.99rem) {
+    .menu-btn { width: 2.75rem; padding: 0; justify-content: center; flex: none; }
+    .menu-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  }
+  :global(html.menu-open) { overflow: hidden; }
+
+  /* ---------- 比較用の案内（/gachi/ で公開しているときだけ） ---------- */
+  .preview {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    padding: .3rem .3rem .3rem .9rem;
+    border-radius: 999px;
+    background: rgba(10, 13, 28, .92);
+    color: var(--on-night-muted);
+    font-size: .75rem;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .5);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .preview-label { white-space: nowrap; }
+  .preview-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .35rem .8rem;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color .3s, color .3s;
+  }
+  .preview-link:hover { background: var(--verb); color: #fff; }
+  @media (max-width: 47.99rem) {
+    .preview { padding: .25rem; }
+    .preview-label { display: none; }
+  }
+  :global(html.menu-open) .preview { display: none; }
+
+  /* ---------- フッター ---------- */
+  .footer {
+    background: var(--night);
+    color: var(--on-night-muted);
+    padding-top: clamp(4rem, 8vw, 6rem);
+    font-size: .88rem;
+    overflow: hidden;
+  }
+  .footer-big {
+    font-size: clamp(2.2rem, 6.4vw, 5.6rem);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: .02em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, .22);
+    word-break: auto-phrase;
+  }
+  .footer-grid {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-bottom: 3rem;
+  }
+  @media (min-width: 56rem) {
+    .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
+  }
+  .footer-ja { color: #fff; font-weight: 700; font-size: 1.05rem; letter-spacing: .05em; }
+  .footer-en { font-size: .78rem; margin-top: .2rem; }
+  .footer-addr { margin-top: 1.25rem; line-height: 1.9; }
+  .footer-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem 1.5rem; align-content: start; }
+  .footer-nav a, .footer-bottom a { text-decoration: none; transition: color .3s; }
+  .footer-nav a { white-space: nowrap; }
+  .footer-bottom a { display: inline-flex; align-items: center; gap: .35rem; }
+  .footer-nav a:hover, .footer-bottom a:hover { color: #fff; }
+  .footer-legend-title { color: #fff; font-weight: 700; }
+  .footer-legend ul { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin-top: .75rem; }
+  .footer-legend li { display: inline-flex; align-items: center; gap: .45rem; font-family: var(--font-mono); font-size: .8rem; }
+  .footer-legend li span { width: .9rem; height: .35rem; border-radius: 2px; background: var(--c); }
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.5rem 2rem;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    font-size: .78rem;
+  }
+</style>

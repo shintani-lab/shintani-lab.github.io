@@ -1,0 +1,295 @@
+/* ============================================================
+   試作版（ガチ版）の共通スタイル
+   サイト全体のアクセント色は「品詞の色」です（名詞＝青、動詞＝朱 …）。
+   色・文字・余白はすべてここの :root で決めています。
+   ============================================================ */
+
+:root {
+  /* 紙とインク */
+  --paper: #fafaf6;
+  --paper-2: #f1f0ea;
+  --ink: #0c0f1d;
+  --text: #262b3d;
+  --muted: #5d6275;
+  --line: #e2e1da;
+
+  /* 夜（トップの冒頭・フッター・図） */
+  --night: #0a0d1c;
+  --night-2: #131933;
+  --on-night: #eef0fa;
+  --on-night-muted: #a3a9c4;
+
+  /* 品詞の色：図や帯に使う明るい色 */
+  --noun: #3d5eff;
+  --verb: #ff5a3c;
+  --particle: #12b096;
+  --aux: #9d5cf6;
+  --suffix: #f2a324;
+  --symbol: #8f95a8;
+  --unknown: #e5484d;
+
+  /* 品詞の色：白地の小さな文字に使う濃い色（読みやすさの基準を満たす濃さ） */
+  --noun-ink: #2d4be0;
+  --verb-ink: #c43519;
+  --particle-ink: #0a7a67;
+  --aux-ink: #7438db;
+  --suffix-ink: #9a5f00;
+  --symbol-ink: #656b7e;
+  --unknown-ink: #c22c31;
+
+  --font-ja: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --font-en: "Inter", var(--font-ja);
+  --font-mono: "M PLUS 1 Code", ui-monospace, "SFMono-Regular", monospace;
+
+  --container: 76rem;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --header-h: 4.5rem;
+  --radius: 18px;
+  --radius-lg: 28px;
+  --shadow: 0 1px 2px rgba(12, 15, 29, .04), 0 8px 24px -10px rgba(12, 15, 29, .12);
+  --ease: cubic-bezier(.2, .75, .2, 1);
+}
+
+/* 品詞ごとの色を --c / --c-ink に入れるクラス */
+.pos-noun     { --c: var(--noun);     --c-ink: var(--noun-ink); }
+.pos-verb     { --c: var(--verb);     --c-ink: var(--verb-ink); }
+.pos-particle { --c: var(--particle); --c-ink: var(--particle-ink); }
+.pos-aux      { --c: var(--aux);      --c-ink: var(--aux-ink); }
+.pos-suffix   { --c: var(--suffix);   --c-ink: var(--suffix-ink); }
+.pos-symbol   { --c: var(--symbol);   --c-ink: var(--symbol-ink); }
+.pos-unknown  { --c: var(--unknown);  --c-ink: var(--unknown-ink); }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* hidden 属性（絞り込みで隠した項目など）を、display の指定より優先します */
+[hidden] { display: none !important; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--font-ja);
+  font-size: 1rem;
+  line-height: 1.9;
+  letter-spacing: .02em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; }
+button { font: inherit; }
+h1, h2, h3, h4 {
+  color: var(--ink);
+  line-height: 1.45;
+  font-feature-settings: "palt";
+  /* 対応ブラウザ（Chrome・Edge）では、日本語を文節の切れ目で折り返します */
+  word-break: auto-phrase;
+}
+::selection { background: color-mix(in srgb, var(--noun) 25%, transparent); }
+
+:focus-visible {
+  outline: 2px solid var(--noun);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: .6rem 1rem;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 8px;
+}
+.skip:focus { top: 1rem; }
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.en { font-family: var(--font-en); letter-spacing: 0; }
+.mono { font-family: var(--font-mono); letter-spacing: 0; }
+
+/* ---------- セクション ---------- */
+
+.section { padding-block: clamp(4.5rem, 10vw, 8rem); }
+.section-alt { background: var(--paper-2); }
+.section-night { background: var(--night); color: var(--on-night); }
+.section-night h2, .section-night h3 { color: #fff; }
+
+/* セクション見出し */
+.shead { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.shead-en {
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+.shead-en b { color: var(--noun-ink); font-weight: 700; }
+.shead-ja {
+  margin-top: .5rem;
+  font-size: clamp(1.75rem, 4.4vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: .02em;
+  line-height: 1.25;
+}
+.section-night .shead-en { color: var(--on-night-muted); }
+.section-night .shead-en b { color: #8fa3ff; }
+.shead-ja .ph { display: inline-block; }
+.shead-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.shead-row > .shead { margin-bottom: 0; }
+
+/* ---------- ボタン・リンク ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 3.1rem;
+  padding: .7rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .95rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform .35s var(--ease), background-color .3s, color .3s, border-color .3s, box-shadow .3s;
+}
+.btn svg { transition: transform .35s var(--ease); flex: none; }
+.btn:hover svg { transform: translateX(3px); }
+.btn-ink { background: var(--ink); color: #fff; }
+.btn-ink:hover { background: var(--noun); }
+.btn-white { background: #fff; color: var(--ink); }
+.btn-white:hover { box-shadow: 0 10px 34px -8px rgba(143, 163, 255, .8); }
+.btn-ghost { border: 1px solid rgba(255, 255, 255, .3); color: var(--on-night); }
+.btn-ghost:hover { border-color: #fff; background: rgba(255, 255, 255, .06); }
+.btn-line { border: 1.5px solid var(--ink); color: var(--ink); }
+.btn-line:hover { background: var(--ink); color: #fff; }
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: .15rem;
+  transition: gap .3s var(--ease), color .3s;
+}
+.more:hover { gap: .9rem; color: var(--noun-ink); }
+
+/* ---------- 次のページへのカード ---------- */
+.next { padding-block: clamp(3rem, 6vw, 5rem); }
+.next-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.next-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .25rem 1rem;
+  align-items: end;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: var(--radius-lg);
+  background: var(--ink);
+  color: #fff;
+  text-decoration: none;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+.next-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c);
+  transform: translateY(101%);
+  transition: transform .5s var(--ease);
+}
+.next-card:hover::before { transform: none; }
+.next-card .mono { grid-column: 1 / -1; font-size: .78rem; opacity: .75; }
+.next-title { font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-weight: 900; }
+
+/* ---------- 小さな札 ---------- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .12rem .65rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.8;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--c, var(--symbol)) 12%, #fff);
+  color: var(--c-ink, var(--symbol-ink));
+}
+.tag::before {
+  content: "";
+  width: .45rem;
+  height: .45rem;
+  border-radius: 50%;
+  background: var(--c, var(--symbol));
+}
+
+/* 「」の強調（蛍光ペン） */
+.mk {
+  background: linear-gradient(transparent 60%, color-mix(in srgb, var(--c, var(--suffix)) 32%, transparent) 60%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding-inline: .05em;
+}
+
+/* ---------- スクロールで現れる動き ---------- */
+/* JavaScript が動かない環境では最初から表示されます（html.js のときだけ隠す） */
+
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1s var(--ease), transform 1s var(--ease);
+  transition-delay: var(--d, 0ms);
+}
+.js [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* ---------- ページ切り替えの動き（対応ブラウザのみ） ---------- */
+
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: .28s var(--ease) both vt-out; }
+::view-transition-new(root) { animation: .45s var(--ease) both vt-in; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(12px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js [data-reveal] { opacity: 1; transform: none; transition: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}

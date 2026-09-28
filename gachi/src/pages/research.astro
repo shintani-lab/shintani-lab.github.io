@@ -1,0 +1,137 @@
+---
+// 研究内容ページ
+import Layout from '../layouts/Layout.astro';
+import PageHead from '../components/PageHead.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Pipeline from '../components/Pipeline.astro';
+import Arrow from '../components/Arrow.astro';
+import Icon from '../components/Icon.astro';
+import { iconForField } from '../lib/icons';
+import { research, site, pad2, url } from '../lib/data';
+import { titles, CYCLE } from '../lib/lang';
+
+const [first, ...rest] = research.introduction;
+---
+<Layout title="研究内容" description="認知言語学・言語データ分析研究室の研究内容です。ことば・こころのデータを、Pythonや統計解析を用いて分析しています。">
+  <PageHead tokens={titles.research} en="Research">
+    <p class="phead-lead">{first}</p>
+  </PageHead>
+
+  {rest.length > 0 && (
+    <section class="section intro">
+      <div class="container intro-grid">
+        {rest.map((p, i) => (
+          <div class="intro-col" data-reveal style={`--d:${i * 120}ms`}>
+            <p>{p}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="section section-alt">
+    <div class="container">
+      <SectionHead num="01" en="Fields" ja="研究分野" />
+      <ul class="fields" role="list">
+        {research.fields.map((f, i) => (
+          <li data-reveal style={`--d:${(i % 3) * 90}ms`}>
+            <div class={`field pos-${CYCLE[i % CYCLE.length]}`}>
+              <span class="field-num en">{pad2(i + 1)}</span>
+              <span class="field-icon"><Icon name={iconForField(f)} size={30} /></span>
+              <span class="field-name">{f}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHead num="02" en="Data flow" ja="データ分析の工程" />
+      <p class="flow-lead">
+        左の説明をスクロールすると、右の図の中でデータが姿を変えていきます。
+        <span class="flow-note">（図の中のことばや数値は、流れを示すための例です）</span>
+      </p>
+      <Pipeline />
+    </div>
+  </section>
+
+  <section class="section section-alt next">
+    <div class="container next-grid">
+      <a class="next-card pos-particle" href={url('/projects/')}>
+        <span class="mono">Projects</span>
+        <span class="next-title">研究テーマを見る</span>
+        <Arrow size={22} />
+      </a>
+      <a class="next-card pos-aux" href={site.professor.links.researchmap} target="_blank" rel="noopener">
+        <span class="mono">researchmap</span>
+        <span class="next-title">教員の研究業績（researchmap）</span>
+        <Arrow kind="out" size={22} />
+      </a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .intro-grid { display: grid; gap: 2.5rem 4rem; }
+  @media (min-width: 56rem) { .intro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .intro-col { display: grid; gap: 1rem; padding-top: 1.25rem; border-top: 2px solid var(--ink); }
+  .intro-col p { font-size: clamp(1rem, 1.4vw, 1.1rem); line-height: 2.05; }
+
+  .fields {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+  .field {
+    position: relative;
+    display: grid;
+    align-content: space-between;
+    gap: 2.5rem;
+    height: 100%;
+    min-height: 13rem;
+    padding: 1.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    isolation: isolate;
+    transition: color .45s var(--ease), transform .45s var(--ease);
+  }
+  .field::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--c);
+    clip-path: circle(0% at 3.25rem 3.25rem);
+    transition: clip-path .6s var(--ease);
+  }
+  .field:hover { color: #fff; transform: translateY(-4px); }
+  .field:hover::before { clip-path: circle(150% at 3.25rem 3.25rem); }
+  .field-num { position: absolute; top: 1.5rem; right: 1.75rem; font-size: .85rem; font-weight: 700; opacity: .5; }
+  .field-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--c) 14%, #fff);
+    color: var(--c-ink);
+    transition: background-color .45s, color .45s;
+  }
+  .field:hover .field-icon { background: rgba(255, 255, 255, .2); color: #fff; }
+  .field-name {
+    font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+    font-weight: 900;
+    line-height: 1.5;
+    color: inherit;
+    font-feature-settings: "palt";
+  }
+  .field:not(:hover) .field-name { color: var(--ink); }
+
+  .flow-lead { margin: -1.5rem 0 2rem; color: var(--muted); }
+  .flow-note { font-size: .85rem; }
+
+</style>

@@ -1,0 +1,42 @@
+---
+// ページが見つからないとき（開こうとしたURLを「未知語」として表示します）
+import Layout from '../layouts/Layout.astro';
+import PageHead from '../components/PageHead.astro';
+import Arrow from '../components/Arrow.astro';
+import { url } from '../lib/data';
+import { titles } from '../lib/lang';
+---
+<Layout title="ページが見つかりません" noindex>
+  <PageHead tokens={titles.notFound} en="404 Not Found">
+    <div class="unk" aria-hidden="true">
+      <span class="unk-tok pos-unknown">
+        <span class="unk-s mono" data-path>/???</span>
+        <span class="unk-p mono">未知語</span>
+      </span>
+    </div>
+    <p class="phead-lead">
+      お探しのページは、辞書に載っていないようです。URLが変わったか、削除された可能性があります。
+    </p>
+    <p class="actions"><a class="btn btn-ink" href={url('/')}>トップページへ<Arrow /></a></p>
+  </PageHead>
+</Layout>
+
+<script>
+  const el = document.querySelector('[data-path]');
+  if (el) el.textContent = decodeURIComponent(location.pathname);
+</script>
+
+<style>
+  .unk { margin-top: 2.5rem; }
+  .unk-tok { display: inline-flex; flex-direction: column; max-width: 100%; }
+  .unk-s {
+    padding-bottom: .3rem;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-weight: 700;
+    color: var(--ink);
+    border-bottom: 4px dashed var(--c);
+    word-break: break-all;
+  }
+  .unk-p { margin-top: .5rem; font-size: .8rem; color: var(--c-ink); }
+  .actions { margin-top: 2rem; }
+</style>

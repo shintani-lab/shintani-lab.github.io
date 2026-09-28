@@ -1,0 +1,255 @@
+---
+// メンバーページ
+import Layout from '../layouts/Layout.astro';
+import PageHead from '../components/PageHead.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Identicon from '../components/Identicon.astro';
+import Arrow from '../components/Arrow.astro';
+import { site, students, studentsByGrade, professorExtra, url } from '../lib/data';
+import { titles, splitQuotes, CYCLE } from '../lib/lang';
+
+const prof = site.professor;
+
+// 「新谷 真由」と「しんたに まゆ」を空白で分け、数が合えば1語ずつルビを振ります
+const nameParts = prof.name_ja.split(/\s+/);
+const kanaParts = prof.name_kana.split(/\s+/);
+const ruby = nameParts.length === kanaParts.length;
+
+const gradeColor = (i: number) => CYCLE[(i + 1) % CYCLE.length];
+---
+<Layout title="メンバー" description="認知言語学・言語データ分析研究室の教員と学生の紹介です。">
+  <PageHead tokens={titles.members} en="Members" />
+
+  <!-- ============ 教員 ============ -->
+  <section class="section">
+    <div class="container prof">
+      {prof.photo && (
+        <div class="prof-photo" data-reveal>
+          <img src={url(prof.photo)} width={prof.photo_width} height={prof.photo_height}
+               alt={prof.photo_alt || prof.name_ja} decoding="async" />
+          <p class="prof-photo-cap mono">Professor</p>
+        </div>
+      )}
+      <div class="prof-body">
+        <p class="prof-role"><span class="tag pos-verb">{prof.title}</span></p>
+        <h2 class="prof-name">
+          {ruby
+            ? nameParts.map((n, i) => <ruby>{n}<rp>（</rp><rt>{kanaParts[i]}</rt><rp>）</rp></ruby>)
+            : <>{prof.name_ja}<span class="prof-kana">{prof.name_kana}</span></>}
+        </h2>
+        <ul class="prof-affil" role="list">
+          <li>{prof.affiliation}</li>
+          {prof.affiliation_lines.map((l) => <li>{l}</li>)}
+        </ul>
+
+        <p class="prof-profile" data-reveal>
+          {splitQuotes(prof.profile).map((q) => q.quote ? <span class="mk pos-suffix">{q.text}</span> : q.text)}
+        </p>
+
+        {professorExtra.length > 0 && (
+          <dl class="extra">
+            {professorExtra.map((e, i) => (
+              <div class={`extra-card pos-${CYCLE[(i + 2) % CYCLE.length]}`} data-reveal style={`--d:${i * 100}ms`}>
+                <dt>{e.label}</dt>
+                <dd>{splitQuotes(e.body).map((q) => q.quote ? <span class="mk">{q.text}</span> : q.text)}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        <div class="prof-links">
+          <a class="btn btn-line" href={prof.links.researchmap} target="_blank" rel="noopener">researchmap<Arrow kind="out" size={14} /></a>
+          <a class="btn btn-line" href={prof.links.university} target="_blank" rel="noopener">大学公式サイトの研究室紹介<Arrow kind="out" size={14} /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 学生 ============ -->
+  {students.length > 0 && (
+    <section class="section section-alt">
+      <div class="container">
+        <div class="shead-row">
+          <SectionHead num="02" en="Students" ja="学生" />
+          <p class="total"><span class="en">{students.length}</span>名</p>
+        </div>
+
+        <!-- 学年の構成（帯グラフ） -->
+        <div class="compo" role="img" aria-label={studentsByGrade.map((g) => `${g.grade}${g.list.length}名`).join('、')}>
+          {studentsByGrade.map((g, i) => (
+            <span class={`compo-seg pos-${gradeColor(i)}`} style={`flex:${g.list.length}; --d:${i * 150}ms`}>
+              <span class="compo-label">{g.grade || '（学年未記入）'}</span>
+              <span class="compo-n en">{g.list.length}</span>
+            </span>
+          ))}
+        </div>
+
+        <div class="grades">
+          {studentsByGrade.map((g, i) => (
+            <div class={`grade pos-${gradeColor(i)}`}>
+              <h3 class="grade-title"><span class="grade-dot"></span>{g.grade || '（学年未記入）'}<span class="grade-n mono">{g.list.length}名</span></h3>
+              <ul class="cards" role="list">
+                {g.list.map((s, k) => (
+                  <li class="card" data-reveal style={`--d:${k * 70}ms`}>
+                    <Identicon name={s.name || g.grade} size={64} />
+                    <span class="card-name">{s.name || '（氏名未記入）'}</span>
+                    {s.theme && <span class="card-theme">{s.theme}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p class="note">※ 学生のアイコンは顔写真の代わりに、名前の文字から自動で作った模様です（同じ名前からは、いつも同じ模様ができます）。</p>
+      </div>
+    </section>
+  )}
+</Layout>
+
+<style>
+  /* ---------- 教員 ---------- */
+  .prof { display: grid; gap: 2.5rem; }
+  @media (min-width: 60rem) {
+    .prof { grid-template-columns: minmax(16rem, 24rem) 1fr; gap: clamp(3rem, 6vw, 6rem); align-items: start; }
+    .prof-photo { position: sticky; top: calc(var(--header-h) + 2rem); }
+  }
+  .prof-photo { position: relative; max-width: 26rem; }
+  .prof-photo img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+  .prof-photo-cap {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    padding: .2rem .7rem;
+    border-radius: 999px;
+    background: rgba(10, 13, 28, .75);
+    color: #fff;
+    font-size: .75rem;
+  }
+  .prof-name {
+    margin-top: 1.25rem;
+    font-size: clamp(2.8rem, 7vw, 5.2rem);
+    font-weight: 900;
+    line-height: 1.35;
+    letter-spacing: .08em;
+  }
+  .prof-name ruby + ruby { margin-left: .4em; }
+  .prof-name rt {
+    font-family: var(--font-mono);
+    font-size: .16em;
+    font-weight: 500;
+    letter-spacing: .3em;
+    color: var(--muted);
+  }
+  .prof-kana { display: block; font-size: .9rem; font-weight: 500; color: var(--muted); letter-spacing: .2em; }
+  .prof-affil {
+    margin-top: 1.25rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--verb);
+    font-size: .92rem;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+  .prof-profile {
+    margin-top: 2.5rem;
+    font-size: clamp(1.08rem, 1.6vw, 1.25rem);
+    font-weight: 500;
+    line-height: 2.05;
+    color: var(--ink);
+  }
+  .extra { display: grid; gap: 1rem; margin-top: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+  .extra-card {
+    padding: 1.6rem 1.6rem 1.75rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--c) 8%, var(--paper));
+    border: 1px solid color-mix(in srgb, var(--c) 22%, transparent);
+  }
+  .extra-card dt {
+    display: inline-block;
+    padding: .1rem .75rem;
+    border-radius: 999px;
+    background: var(--c);
+    color: #fff;
+    font-weight: 900;
+    font-size: .9rem;
+    letter-spacing: .15em;
+  }
+  .extra-card dd { margin-top: .9rem; line-height: 1.95; }
+  .prof-links { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.5rem; }
+
+  /* ---------- 学生 ---------- */
+  .total { font-weight: 700; }
+  .total .en { font-size: clamp(3rem, 7vw, 5rem); font-weight: 800; line-height: 1; margin-right: .2rem; }
+
+  .compo {
+    display: flex;
+    gap: 4px;
+    height: 4.5rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+  .compo-seg {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .5rem;
+    min-width: 0;
+    padding: .6rem .9rem;
+    border-radius: 12px;
+    background: var(--c);
+    color: #fff;
+    transform-origin: left;
+    animation: grow 1s var(--ease) both;
+    animation-delay: var(--d);
+  }
+  @keyframes grow { from { transform: scaleX(0); } }
+  @media (prefers-reduced-motion: reduce) { .compo-seg { animation: none; } }
+  .compo-label { font-size: .82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .compo-n { font-size: 1.9rem; font-weight: 800; line-height: 1; }
+  @media (max-width: 39.99rem) {
+    .compo-seg { flex-direction: column; align-items: flex-start; padding: .5rem .6rem; }
+    .compo-label { font-size: .68rem; max-width: 100%; }
+    .compo-n { font-size: 1.5rem; }
+    .card { padding: 1.1rem; }
+    .card-name { font-size: 1.05rem; letter-spacing: .05em; }
+  }
+
+  .grades { display: grid; gap: 3rem; }
+  .grade-title {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    font-size: 1.3rem;
+    font-weight: 900;
+    padding-bottom: .9rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .grade-dot { width: .8rem; height: .8rem; border-radius: 3px; background: var(--c); }
+  .grade-n { margin-left: auto; font-size: .82rem; font-weight: 500; color: var(--muted); }
+  .cards {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+  }
+  .card {
+    display: grid;
+    justify-items: start;
+    gap: 1.1rem;
+    padding: 1.4rem;
+    border-radius: var(--radius);
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    transition: transform .45s var(--ease);
+  }
+  .card:hover { transform: translateY(-5px); }
+  .card :global(.identicon) { transition: transform .5s var(--ease); }
+  .card:hover :global(.identicon) { transform: rotate(-8deg) scale(1.05); }
+  .card-name { font-size: 1.2rem; font-weight: 900; letter-spacing: .1em; color: var(--ink); }
+  .card-theme { font-size: .82rem; color: var(--muted); line-height: 1.7; }
+  .note { margin-top: 2rem; font-size: .8rem; color: var(--muted); }
+</style>

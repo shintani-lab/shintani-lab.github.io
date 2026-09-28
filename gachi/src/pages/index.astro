@@ -1,0 +1,480 @@
+---
+// トップページ
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Arrow from '../components/Arrow.astro';
+import Identicon from '../components/Identicon.astro';
+import Timetable from '../components/Timetable.astro';
+import { formatDot } from '../lib/format';
+import {
+  site, research, join, news, students, studentPublications, pad2, url,
+} from '../lib/data';
+import { markTerms, splitQuotes, catPos, CYCLE } from '../lib/lang';
+
+// 紹介文の中で蛍光ペンを引く語（見つからない語は無視されます）
+const terms = ['ことば', 'コミュニケーション', '認知', '心理', '教育', '学習', 'データ', '構造', '関係性'];
+const lead = markTerms(research.lead_top, terms, site.lab.name_ja);
+
+const stats = [
+  { n: research.fields.length, unit: '', label: '研究分野' },
+  { n: research.themes.length, unit: '', label: '研究テーマ' },
+  { n: students.length, unit: '名', label: '在籍学生' },
+  { n: studentPublications.length, unit: '件', label: '学生の論文・研究発表' },
+];
+
+// 先生の紹介文の最後の一文を、引用として大きく出します
+const sentences = site.professor.profile.split(/(?<=。)/).filter((s) => s.trim());
+const quote = sentences[sentences.length - 1] ?? '';
+
+const latestNews = news.slice(0, 3);
+const fields = research.fields;
+---
+<Layout dark>
+  <Hero />
+
+  <!-- ============ 研究室について ============ -->
+  <section class="section">
+    <div class="container">
+      <p class="kicker mono">About — 研究室について</p>
+      <p class="statement" data-reveal>
+        {lead.map((seg) => seg.mark ? <span class={`hl pos-${seg.mark}`}>{seg.text}</span> : seg.text)}
+      </p>
+      <dl class="stats">
+        {stats.map((s, i) => (
+          <div class={`stat pos-${CYCLE[i]}`} data-reveal style={`--d:${i * 90}ms`}>
+            <dt>{s.label}</dt>
+            <dd><span class="stat-n en" data-count={s.n}>{s.n}</span>{s.unit && <span class="stat-u">{s.unit}</span>}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============ 研究のアプローチ ============ -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="shead-row">
+        <SectionHead num="01" en="Approach" ja="研究のアプローチ" />
+        <a class="more" href={url('/research/')}>データ分析の工程を見る<Arrow /></a>
+      </div>
+      <ol class="approach" role="list">
+        {research.approach.map((a, i) => (
+          <li class={`ap pos-${CYCLE[i]}`} data-reveal style={`--d:${i * 110}ms`}>
+            <span class="ap-num en">{pad2(a.step)}</span>
+            <h3 class="ap-title">{a.title}</h3>
+            <p class="ap-body">{a.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 研究分野（流れる帯） ============ -->
+  <section class="band" aria-labelledby="band-title">
+    <h2 id="band-title" class="sr-only">研究分野</h2>
+    <ul class="sr-only">{fields.map((f) => <li>{f}</li>)}</ul>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        {[0, 1].map(() => fields.map((f, i) => (
+          <span class={`mq pos-${CYCLE[i % CYCLE.length]}`}><i></i>{f}</span>
+        )))}
+      </div>
+    </div>
+    <div class="marquee marquee-rev" aria-hidden="true">
+      <div class="marquee-track">
+        {[0, 1].map(() => [...fields].reverse().map((f) => <span class="mq mq-line">{f}</span>))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 研究テーマ（重なっていくカード） ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="shead-row">
+        <SectionHead num="02" en="Projects" ja="研究テーマ" />
+        <a class="more" href={url('/projects/')}>学生の研究テーマも見る<Arrow /></a>
+      </div>
+      <ol class="stack" role="list">
+        {research.themes.map((t, i) => (
+          <li class={`stack-card pos-${CYCLE[i % CYCLE.length]}`} style={`--i:${i}`}>
+            <span class="stack-num en">{pad2(i + 1)}</span>
+            <p class="stack-text">{t}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ メンバー ============ -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="shead-row">
+        <SectionHead num="03" en="Members" ja="メンバー" />
+        <a class="more" href={url('/members/')}>メンバー紹介へ<Arrow /></a>
+      </div>
+      <div class="people">
+        {quote && (
+          <figure class="quote" data-reveal>
+            <span class="quote-mark en" aria-hidden="true">“</span>
+            <blockquote>
+              <p>{splitQuotes(quote).map((q) => q.quote ? <span class="mk pos-suffix">{q.text}</span> : q.text)}</p>
+            </blockquote>
+            <figcaption>
+              {site.professor.photo && (
+                <img src={url(site.professor.photo)} alt="" width="56" height="56" loading="lazy" decoding="async" />
+              )}
+              <span>
+                <b>{site.professor.name_ja}</b>
+                <span>{site.professor.title}・紹介文より</span>
+              </span>
+            </figcaption>
+          </figure>
+        )}
+        {students.length > 0 && (
+          <div class="crowd" data-reveal style="--d:120ms">
+            <p class="crowd-title">在籍学生 <b class="en">{students.length}</b> 名</p>
+            <ul class="crowd-list" role="list">
+              {students.map((s, i) => (
+                <li style={`--i:${i}`}>
+                  <Identicon name={s.name || s.grade} size={60} />
+                  <span>{s.name || '（氏名未記入）'}</span>
+                </li>
+              ))}
+            </ul>
+            <p class="crowd-note">※ アイコンは、名前の文字から自動で作った模様です。</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ お知らせ ============ -->
+  {latestNews.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="shead-row">
+          <SectionHead num="04" en="News" ja="お知らせ" />
+          <a class="more" href={url('/news/')}>すべてのお知らせ<Arrow /></a>
+        </div>
+        <ul class="ncards" role="list">
+          {latestNews.map((n, i) => (
+            <li data-reveal style={`--d:${i * 90}ms`}>
+              <a class={`ncard pos-${catPos(n.category)}`} href={url(`/news/${n.id}/`)}>
+                <span class="ncard-top">
+                  <span class="ncard-date mono">{n.date_label ?? formatDot(n.date)}</span>
+                  <span class="tag">{n.category}</span>
+                </span>
+                <span class="ncard-title">{n.title}</span>
+                <span class="ncard-go"><Arrow /></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- ============ 配属を検討している方へ ============ -->
+  <section class="section section-night joincta">
+    <div class="container joincta-grid">
+      <div>
+        <SectionHead num="05" en="Join Us" ja="配属を検討している方へ" />
+        <p class="joincta-lead">{research.introduction[2] ?? research.introduction[0]}</p>
+        <div class="joincta-actions">
+          <a class="btn btn-white" href={url('/join/')}>配属希望の方への案内<Arrow /></a>
+          <a class="btn btn-ghost" href={url('/contact/')}>連絡先</a>
+        </div>
+      </div>
+      <div class="joincta-tt" data-reveal>
+        <p class="joincta-tt-title mono">ゼミの時間割</p>
+        <Timetable slots={join.seminar.slots} tone="dark" />
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // 数字をカウントアップします（画面に入ったとき1回だけ）
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      io.unobserve(e.target);
+      const el = e.target as HTMLElement;
+      const to = Number(el.dataset.count);
+      if (reduce || !to) continue;
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - t0) / 1100);
+        el.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      el.textContent = '0';
+      requestAnimationFrame(tick);
+    }
+  }, { threshold: 0.6 });
+  document.querySelectorAll('[data-count]').forEach((el) => io.observe(el));
+</script>
+
+<style>
+  .kicker { font-size: .8rem; color: var(--muted); }
+
+  /* ---------- 研究室について ---------- */
+  .statement {
+    margin-top: 1.5rem;
+    max-width: 58rem;
+    font-size: clamp(1.45rem, 3.2vw, 2.55rem);
+    font-weight: 700;
+    line-height: 1.75;
+    color: var(--ink);
+    letter-spacing: .02em;
+    font-feature-settings: "palt";
+  }
+  .hl {
+    background: linear-gradient(transparent 58%, color-mix(in srgb, var(--c) 30%, transparent) 58%) no-repeat 0 0 / 0% 100%;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    transition: background-size 1.1s var(--ease);
+  }
+  .statement.is-in .hl { background-size: 100% 100%; }
+  .statement.is-in .hl:nth-of-type(2) { transition-delay: .25s; }
+  .statement.is-in .hl:nth-of-type(3) { transition-delay: .5s; }
+  .statement.is-in .hl:nth-of-type(4) { transition-delay: .75s; }
+  .statement.is-in .hl:nth-of-type(5) { transition-delay: 1s; }
+  .statement.is-in .hl:nth-of-type(n + 6) { transition-delay: 1.25s; }
+  :global(html:not(.js)) .hl { background-size: 100% 100%; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: clamp(3rem, 6vw, 5rem);
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  @media (min-width: 56rem) { .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .stat { padding: 1.5rem 1.5rem 1.25rem; background: var(--paper); }
+  .stat dt { font-size: .85rem; font-weight: 700; color: var(--muted); }
+  .stat dd { display: flex; align-items: baseline; gap: .3rem; margin-top: .5rem; }
+  .stat-n { font-size: clamp(2.8rem, 6vw, 4.5rem); font-weight: 800; line-height: 1; color: var(--c-ink); font-variant-numeric: tabular-nums; }
+  .stat-u { font-weight: 700; color: var(--ink); }
+
+  /* ---------- 研究のアプローチ ---------- */
+  .approach {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    counter-reset: ap;
+  }
+  .ap {
+    position: relative;
+    padding: 1.75rem 1.5rem 2rem;
+    background: var(--paper);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+  }
+  .ap::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 6px;
+    background: var(--c);
+  }
+  .ap:hover { transform: translateY(-6px); box-shadow: 0 24px 48px -20px rgba(12, 15, 29, .3); }
+  .ap-num {
+    display: block;
+    font-size: clamp(3.2rem, 5vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1;
+    /* 「4」などは線が重なった形のため、輪郭の上から背景色で中を塗って重なり線を隠します */
+    color: var(--paper);
+    -webkit-text-stroke: 3px var(--c);
+    paint-order: stroke fill;
+    transition: color .4s;
+  }
+  .ap:hover .ap-num { color: var(--c); }
+  .ap-title { margin-top: 1.25rem; font-size: 1.1rem; font-weight: 900; }
+  .ap-body { margin-top: .5rem; font-size: .92rem; color: var(--muted); line-height: 1.8; }
+
+  /* ---------- 研究分野（流れる帯） ---------- */
+  .band {
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+    background: var(--paper);
+    border-block: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .marquee { overflow: hidden; }
+  .marquee + .marquee { margin-top: .5rem; }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: mq 60s linear infinite;
+  }
+  .marquee-rev .marquee-track { animation-direction: reverse; animation-duration: 75s; }
+  @keyframes mq { to { transform: translateX(-50%); } }
+  .mq {
+    display: inline-flex;
+    align-items: center;
+    gap: .35em;
+    padding-right: .7em;
+    font-size: clamp(2.2rem, 6vw, 4.8rem);
+    font-weight: 900;
+    line-height: 1.25;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .mq i {
+    width: .32em;
+    height: .32em;
+    border-radius: 50%;
+    background: var(--c);
+  }
+  .mq-line {
+    color: transparent;
+    -webkit-text-stroke: 1.2px color-mix(in srgb, var(--ink) 45%, transparent);
+  }
+  .mq-line::after { content: "／"; padding-left: .7em; -webkit-text-stroke: 0; color: var(--line); }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+  }
+
+  /* ---------- 研究テーマ（重なっていくカード） ---------- */
+  .stack { display: grid; gap: 1.5rem; }
+  .stack-card {
+    position: sticky;
+    top: calc(var(--header-h) + 1.25rem + var(--i) * 1.2rem);
+    display: grid;
+    gap: 1.25rem 2.5rem;
+    min-height: clamp(10rem, 22vh, 13rem);
+    padding: clamp(1.75rem, 4vw, 3rem);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--c) 9%, var(--paper));
+    border: 1px solid color-mix(in srgb, var(--c) 22%, transparent);
+    box-shadow: 0 -12px 30px -18px rgba(12, 15, 29, .25);
+    align-content: center;
+  }
+  @media (min-width: 48rem) {
+    .stack-card { grid-template-columns: auto 1fr; align-items: center; }
+  }
+  .stack-num {
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    font-weight: 800;
+    line-height: .9;
+    color: var(--c);
+  }
+  .stack-text {
+    font-size: clamp(1.4rem, 3vw, 2.25rem);
+    font-weight: 900;
+    line-height: 1.5;
+    color: var(--ink);
+    font-feature-settings: "palt";
+    word-break: auto-phrase;
+  }
+
+  /* ---------- メンバー ---------- */
+  .people { display: grid; gap: 2rem; }
+  @media (min-width: 64rem) { .people { grid-template-columns: 1.15fr 1fr; gap: 3rem; align-items: start; } }
+  .quote {
+    position: relative;
+    padding: clamp(2rem, 4vw, 3rem);
+    padding-top: clamp(3.5rem, 6vw, 4.5rem);
+    background: var(--paper);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .quote-mark {
+    position: absolute;
+    top: -.1em;
+    left: .2em;
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--suffix);
+  }
+  .quote blockquote p {
+    font-size: clamp(1.25rem, 2.3vw, 1.7rem);
+    font-weight: 700;
+    line-height: 1.8;
+    color: var(--ink);
+    font-feature-settings: "palt";
+  }
+  .quote figcaption { display: flex; align-items: center; gap: .9rem; margin-top: 2rem; font-size: .88rem; color: var(--muted); }
+  .quote figcaption img { width: 3.5rem; height: 3.5rem; border-radius: 50%; object-fit: cover; object-position: 50% 30%; }
+  .quote figcaption b { display: block; color: var(--ink); font-size: 1rem; }
+
+  .crowd { padding: clamp(1.5rem, 3vw, 2rem); background: var(--night); color: var(--on-night); border-radius: var(--radius-lg); }
+  .crowd-title { font-weight: 700; }
+  .crowd-title b { font-size: 2.4rem; font-weight: 800; color: #fff; margin-inline: .15rem; }
+  .crowd-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+    gap: 1.25rem .75rem;
+    margin-top: 1.25rem;
+  }
+  .crowd-list li { display: grid; justify-items: center; gap: .5rem; font-size: .82rem; font-weight: 500; text-align: center; }
+  .crowd-list li :global(svg) { transition: transform .4s var(--ease); }
+  .crowd-list li:hover :global(svg) { transform: translateY(-4px) rotate(-4deg); }
+  .crowd-note { margin-top: 1.25rem; font-size: .75rem; color: var(--on-night-muted); }
+
+  /* ---------- お知らせ ---------- */
+  .ncards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
+  .ncard {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    height: 100%;
+    min-height: 13rem;
+    padding: 1.5rem 1.5rem 3.5rem;
+    border-radius: var(--radius);
+    background: #fff;
+    border: 1px solid var(--line);
+    text-decoration: none;
+    transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .3s;
+  }
+  .ncard:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--c); }
+  .ncard-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+  .ncard-date { font-size: .82rem; color: var(--muted); }
+  .ncard-title { font-weight: 700; font-size: 1.05rem; line-height: 1.7; color: var(--ink); }
+  .ncard-go {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--paper-2);
+    transition: background-color .3s, color .3s;
+  }
+  .ncard:hover .ncard-go { background: var(--c); color: #fff; }
+
+  /* ---------- 配属を検討している方へ ---------- */
+  .joincta { position: relative; overflow: hidden; isolation: isolate; }
+  .joincta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(40% 60% at 100% 0%, color-mix(in srgb, var(--verb) 30%, transparent), transparent 70%),
+      radial-gradient(40% 60% at 0% 100%, color-mix(in srgb, var(--noun) 30%, transparent), transparent 70%);
+  }
+  .joincta-grid { display: grid; gap: 3rem; }
+  @media (min-width: 64rem) { .joincta-grid { grid-template-columns: 1.1fr 1fr; align-items: center; gap: 5rem; } }
+  .joincta-lead { color: var(--on-night-muted); max-width: 36rem; }
+  .joincta-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+  .joincta-tt {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .1);
+  }
+  .joincta-tt-title { font-size: .8rem; color: var(--on-night-muted); margin-bottom: 1rem; }
+</style>

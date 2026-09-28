@@ -1,0 +1,11 @@
+---
+// セクションの見出し（番号と英語の小さなラベル＋日本語の大きな見出し）
+import { phrases } from '../lib/lang';
+
+interface Props { num?: string; en: string; ja: string }
+const { num, en, ja } = Astro.props;
+---
+<div class="shead">
+  <p class="shead-en" lang="en">{num && <b>{num}</b>} {num && '/'} {en}</p>
+  <h2 class="shead-ja">{phrases(ja).map((p) => <span class="ph">{p}</span>)}</h2>
+</div>

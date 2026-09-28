@@ -1,0 +1,153 @@
+---
+// ゼミの時間割を、1週間の時間割表として描きます。
+// content/join.yaml の seminar.slots に「〇曜△・□限」と書かれていれば表に載ります。
+// 読み取れない行（例：「他曜日に実施」）は、表の下に文章のまま並べます。
+// 1行も読み取れないときは表を描かず、文章の一覧だけを出します（内容が消えないように）。
+interface Props { slots: string[]; tone?: 'light' | 'dark' }
+const { slots, tone = 'light' } = Astro.props;
+
+const COLORS = ['noun', 'verb', 'particle', 'aux', 'suffix'];
+const toNum = (s: string) =>
+  Number(s.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0)));
+
+const parsed = slots.map((raw, i) => {
+  const cut = raw.indexOf('：');
+  const label = cut < 0 ? raw : raw.slice(0, cut);
+  const time = cut < 0 ? '' : raw.slice(cut + 1);
+  const m = time.match(/([月火水木金土日])曜\s*([0-9０-９]+(?:\s*[・、,〜～\-]\s*[0-9０-９]+)*)\s*限/);
+  let periods: number[] = [];
+  if (m) {
+    const range = m[2].match(/^([0-9０-９]+)\s*[〜～\-]\s*([0-9０-９]+)$/);
+    if (range) {
+      for (let p = toNum(range[1]); p <= toNum(range[2]); p++) periods.push(p);
+    } else {
+      periods = m[2].split(/[・、,]/).map((p) => toNum(p.trim()));
+    }
+  }
+  return { label, time, day: m?.[1], periods, color: COLORS[i % COLORS.length] };
+});
+
+const onGrid = parsed.filter((p) => p.day && p.periods.length);
+const offGrid = parsed.filter((p) => !(p.day && p.periods.length));
+const days = ['月', '火', '水', '木', '金', ...(onGrid.some((p) => p.day === '土') ? ['土'] : [])];
+const maxP = Math.max(5, ...onGrid.flatMap((p) => p.periods));
+
+// 同じ曜日で時間が重なるものは、横に並べます（レーン分け）
+const blocks = days.map((day) => {
+  const list = onGrid.filter((p) => p.day === day).map((p) => ({
+    ...p, start: Math.min(...p.periods), end: Math.max(...p.periods), lane: 0,
+  }));
+  const lanes: number[] = [];
+  for (const b of list) {
+    let lane = lanes.findIndex((end) => end < b.start);
+    if (lane < 0) lane = lanes.length;
+    lanes[lane] = b.end;
+    b.lane = lane;
+  }
+  return { day, list, laneCount: Math.max(1, lanes.length) };
+});
+---
+{slots.length > 0 && (
+  <div class:list={['tt', `tt-${tone}`]}>
+    {onGrid.length > 0 && (
+    <div class="tt-grid" style={`--days:${days.length}; --rows:${maxP}`} role="img"
+         aria-label={onGrid.map((p) => `${p.label}：${p.time}`).join('、')}>
+      <span></span>
+      {days.map((d) => <span class="tt-dayname">{d}</span>)}
+      {Array.from({ length: maxP }, (_, r) => (
+        <span class="tt-period mono" style={`grid-row:${r + 2}`}>{r + 1}</span>
+      ))}
+      {blocks.map((b, c) => (
+        <div class="tt-day" style={`grid-column:${c + 2}; grid-row:2 / span ${maxP}`}>
+          {Array.from({ length: maxP }, (_, r) => <span class="tt-cell" style={`top:${(r / maxP) * 100}%; height:${100 / maxP}%`}></span>)}
+          {b.list.map((s) => (
+            <span
+              class={`tt-block pos-${s.color}`}
+              style={`top:${((s.start - 1) / maxP) * 100}%; height:${((s.end - s.start + 1) / maxP) * 100}%; left:${(s.lane / b.laneCount) * 100}%; width:${100 / b.laneCount}%`}
+            ></span>
+          ))}
+        </div>
+      ))}
+    </div>
+    )}
+    <ul class="tt-legend" role="list">
+      {onGrid.map((p) => (
+        <li class={`pos-${p.color}`}>
+          <span class="tt-swatch"></span>
+          <span class="tt-label">{p.label}</span>
+          <span class="tt-time mono">{p.time}</span>
+        </li>
+      ))}
+      {offGrid.map((p) => (
+        <li class="tt-off">
+          <span class="tt-swatch tt-swatch-off"></span>
+          <span class="tt-label">{p.label}</span>
+          {p.time && <span class="tt-time">{p.time}</span>}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<style>
+  .tt { --tt-line: var(--line); --tt-text: var(--muted); --tt-cell: #fff; }
+  .tt-dark { --tt-line: rgba(255, 255, 255, .1); --tt-text: var(--on-night-muted); --tt-cell: rgba(255, 255, 255, .03); }
+
+  .tt-grid {
+    display: grid;
+    grid-template-columns: 1.75rem repeat(var(--days), minmax(0, 1fr));
+    grid-template-rows: auto repeat(var(--rows), 2.4rem);
+    gap: 0 .35rem;
+  }
+  .tt-dayname {
+    padding-bottom: .4rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: .88rem;
+    color: var(--tt-text);
+  }
+  .tt-period {
+    grid-column: 1;
+    align-self: center;
+    font-size: .72rem;
+    color: var(--tt-text);
+  }
+  .tt-day { position: relative; }
+  .tt-cell {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-radius: 6px;
+    background: var(--tt-cell);
+    box-shadow: inset 0 0 0 1px var(--tt-line);
+    transform: scale(.94);
+  }
+  .tt-block {
+    position: absolute;
+    padding: 3px;
+  }
+  .tt-block::before {
+    content: "";
+    position: absolute;
+    inset: 3px 2px;
+    border-radius: 8px;
+    background: var(--c);
+    box-shadow: 0 8px 20px -8px var(--c);
+  }
+  .tt-legend { display: grid; gap: .55rem; margin-top: 1.25rem; font-size: .9rem; }
+  .tt-legend li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .1rem .75rem;
+    align-items: center;
+  }
+  .tt-swatch { width: .85rem; height: .85rem; border-radius: 4px; background: var(--c); grid-row: span 2; align-self: start; margin-top: .35rem; }
+  .tt-swatch-off { background: transparent; box-shadow: inset 0 0 0 1.5px var(--tt-text); }
+  .tt-label { font-weight: 700; }
+  .tt-time { grid-column: 2; font-size: .8rem; color: var(--tt-text); }
+  @media (min-width: 40rem) {
+    .tt-legend li { grid-template-columns: auto auto 1fr; }
+    .tt-swatch { grid-row: auto; margin-top: 0; align-self: center; }
+    .tt-time { grid-column: auto; justify-self: end; }
+  }
+</style>

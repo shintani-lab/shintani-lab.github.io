@@ -1,0 +1,118 @@
+---
+// お知らせの記事ページ（content/news/ の Markdown 1つにつき1ページ）
+import Layout from '../../layouts/Layout.astro';
+import Arrow from '../../components/Arrow.astro';
+import { formatDot, formatJa } from '../../lib/format';
+import { news, url } from '../../lib/data';
+import { catPos } from '../../lib/lang';
+
+export function getStaticPaths() {
+  return news.map((n) => ({ params: { id: n.id } }));
+}
+
+const { id } = Astro.params;
+const i = news.findIndex((n) => n.id === id);
+const item = news[i];
+const newer = news[i - 1];
+const older = news[i + 1];
+// 検索結果やSNSに出る説明文。本文の書き出しを使い、無ければ記事タイトルを使います。
+const plain = item.html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 100);
+const description = (plain || item.title) + '（芝浦工業大学 認知言語学・言語データ分析研究室のお知らせ）';
+---
+<Layout title={item.title} description={description}>
+  <article class={`article pos-${catPos(item.category)}`}>
+    <header class="ahead">
+      <div class="container ahead-inner">
+        <a class="back" href={url('/news/')}><span aria-hidden="true">←</span> お知らせ一覧</a>
+        <p class="ameta">
+          <time class="mono" datetime={item.date.toISOString().slice(0, 10)}>
+            {item.date_label ?? formatJa(item.date)}
+          </time>
+          <span class="tag">{item.category}</span>
+        </p>
+        <h1 class="atitle">{item.title}</h1>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="abody" set:html={item.html} />
+    </div>
+  </article>
+
+  <nav class="container pager" aria-label="前後のお知らせ">
+    {older ? (
+      <a class="pager-link" href={url(`/news/${older.id}/`)}>
+        <span class="mono">← 前のお知らせ・{older.date_label ?? formatDot(older.date)}</span>
+        <span class="pager-title">{older.title}</span>
+      </a>
+    ) : <span></span>}
+    {newer ? (
+      <a class="pager-link pager-next" href={url(`/news/${newer.id}/`)}>
+        <span class="mono">次のお知らせ・{newer.date_label ?? formatDot(newer.date)} →</span>
+        <span class="pager-title">{newer.title}</span>
+      </a>
+    ) : <span></span>}
+  </nav>
+
+  <div class="container all">
+    <a class="btn btn-ink" href={url('/news/')}>お知らせ一覧へ<Arrow /></a>
+  </div>
+</Layout>
+
+<style>
+  .ahead {
+    position: relative;
+    padding: calc(var(--header-h) + clamp(3rem, 8vw, 5.5rem)) 0 clamp(2.5rem, 5vw, 3.5rem);
+    background: color-mix(in srgb, var(--c) 8%, var(--paper));
+    border-bottom: 1px solid color-mix(in srgb, var(--c) 25%, transparent);
+    overflow: hidden;
+  }
+  .ahead::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 6px;
+    background: var(--c);
+  }
+  .ahead-inner { max-width: calc(52rem + var(--gutter) * 2); }
+  .back { font-size: .9rem; font-weight: 700; text-decoration: none; color: var(--muted); transition: color .3s; }
+  .back:hover { color: var(--ink); }
+  .ameta { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 2rem; font-size: .9rem; color: var(--muted); }
+  .atitle { margin-top: 1rem; font-size: clamp(1.8rem, 4.5vw, 3.2rem); font-weight: 900; line-height: 1.45; }
+
+  .abody {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 6vw, 4.5rem);
+    font-size: clamp(1.05rem, 1.5vw, 1.18rem);
+    line-height: 2.1;
+  }
+  .abody :global(p + p) { margin-top: 1.25em; }
+  .abody :global(a) { color: var(--c-ink); }
+
+  .pager {
+    display: grid;
+    gap: 1rem;
+    max-width: calc(52rem + var(--gutter) * 2);
+    border-top: 1px solid var(--line);
+    padding-top: 2rem;
+  }
+  @media (min-width: 48rem) { .pager { grid-template-columns: 1fr 1fr; } }
+  .pager-link {
+    display: grid;
+    gap: .4rem;
+    padding: 1.25rem 1.4rem;
+    border-radius: var(--radius);
+    background: #fff;
+    border: 1px solid var(--line);
+    text-decoration: none;
+    transition: border-color .3s, transform .4s var(--ease);
+  }
+  .pager-link:hover { border-color: var(--ink); transform: translateY(-3px); }
+  .pager-next { text-align: right; }
+  .pager-link .mono { font-size: .75rem; color: var(--muted); }
+  .pager-title { font-weight: 700; line-height: 1.6; color: var(--ink); }
+  .all { max-width: calc(52rem + var(--gutter) * 2); padding-block: 2.5rem clamp(4rem, 8vw, 6rem); }
+</style>

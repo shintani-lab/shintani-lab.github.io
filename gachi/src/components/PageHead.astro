@@ -1,0 +1,114 @@
+---
+// 各ページの大きなタイトルです。
+// タイトルを語に分け、それぞれの下に品詞を小さく添えます（語の区切りと品詞は lib/lang.ts の titles）。
+import { POS, type Token } from '../lib/lang';
+
+interface Props {
+  tokens: Token[];
+  en: string;       // 右上に小さく出る英語
+  index?: string;   // 「02 / 07」のような通し番号
+}
+const { tokens, en, index } = Astro.props;
+const plain = tokens.map((t) => t.s).join('');
+// 文字数が多いタイトルは、1行に収まるよう文字を小さくします
+const chars = [...plain].length;
+---
+<header class="phead">
+  <div class="phead-grid" aria-hidden="true"></div>
+  <div class="container">
+    <p class="phead-meta mono">
+      {index && <span>{index}</span>}
+      <span class="en" lang="en">{en}</span>
+      <span class="phead-count">{tokens.length} 形態素</span>
+    </p>
+    <h1 class="phead-title" aria-label={plain} style={`--n:${chars}`}>
+      {tokens.map((t, i) => (
+        <span class={`ptok pos-${t.pos}`} style={`--i:${i}`} aria-hidden="true">
+          <span class="ptok-s">{t.s}</span>
+          <span class="ptok-p mono">{POS[t.pos]}</span>
+        </span>
+      ))}
+    </h1>
+    <slot />
+  </div>
+</header>
+
+<style>
+  .phead {
+    position: relative;
+    overflow: hidden;
+    padding: calc(var(--header-h) + clamp(3rem, 8vw, 6rem)) 0 clamp(3rem, 6vw, 4.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+  /* 方眼紙のような薄い罫線 */
+  .phead-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, .7), transparent 85%);
+    -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, .7), transparent 85%);
+  }
+  .phead-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 1.25rem;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  .phead-count::before { content: "— "; }
+  .phead-title {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: .9rem .12em;
+    font-size: clamp(2.5rem, min(8vw, calc(min(100vw - 2 * var(--gutter), var(--container)) / (var(--n) + 1.8))), 6.4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: .01em;
+  }
+  .ptok {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ptok-s { display: block; padding-bottom: .12em; }
+  .ptok::before {
+    content: "";
+    order: 2;
+    height: max(4px, .06em);
+    border-radius: 99px;
+    background: var(--c);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: bar .7s var(--ease) forwards;
+    animation-delay: calc(250ms + var(--i) * 110ms);
+  }
+  .ptok-p {
+    order: 3;
+    margin-top: .55rem;
+    font-size: .78rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: .02em;
+    color: var(--c-ink);
+    opacity: 0;
+    animation: label .6s var(--ease) forwards;
+    animation-delay: calc(450ms + var(--i) * 110ms);
+  }
+  @keyframes bar { to { transform: scaleX(1); } }
+  @keyframes label { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ptok::before, .ptok-p { animation: none; transform: none; opacity: 1; }
+  }
+  .phead :global(.phead-lead) {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    max-width: 46rem;
+    font-size: clamp(1.02rem, 1.5vw, 1.15rem);
+    line-height: 2;
+  }
+</style>

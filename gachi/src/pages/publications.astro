@@ -1,0 +1,194 @@
+---
+// 業績ページ（学生の論文・研究発表。教員の業績は researchmap へのリンクのみ）
+import Layout from '../layouts/Layout.astro';
+import PageHead from '../components/PageHead.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Arrow from '../components/Arrow.astro';
+import { site, studentPublications, publicationsByYear } from '../lib/data';
+import { titles, catPos } from '../lib/lang';
+
+// 種類ごとの件数
+const types = [...new Set(studentPublications.map((p) => p.type))].map((type) => ({
+  type,
+  n: studentPublications.filter((p) => p.type === type).length,
+}));
+
+// 英語だけのタイトルには lang="en" を付けます
+const isEnglish = (s: string) => !/[　-ヿ㐀-鿿＀-￯]/.test(s);
+let serial = 0;
+const ids = new Map(studentPublications.map((p) => [p, `pub-${++serial}`]));
+const years = [...publicationsByYear].reverse();
+---
+<Layout title="業績" description="認知言語学・言語データ分析研究室の学生の論文・研究発表です。教員の業績はresearchmapに掲載しています。">
+  <PageHead tokens={titles.publications} en="Publications">
+    <p class="phead-lead">学生の論文・研究発表を掲載しています。教員の研究業績は researchmap に掲載しています。</p>
+  </PageHead>
+
+  {studentPublications.length > 0 && (
+    <section class="section summary">
+      <div class="container summary-grid">
+        <div class="counts">
+          <p class="count-all"><span class="en">{studentPublications.length}</span>件</p>
+          <ul class="count-types" role="list">
+            {types.map((t) => (
+              <li class={`pos-${catPos(t.type)}`}><span class="count-bar" style={`--n:${t.n}; --max:${studentPublications.length}`}></span>{t.type}<b class="en">{t.n}</b></li>
+            ))}
+          </ul>
+        </div>
+        <div class="dots" aria-label="年ごとの件数">
+          {years.map((y) => (
+            <div class="dots-year">
+              <ul class="dots-stack" role="list">
+                {y.list.map((p) => (
+                  <li>
+                    <a class={`dot pos-${catPos(p.type)}`} href={`#${ids.get(p)}`} title={p.title}>
+                      <span class="sr-only">{p.type}：{p.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <span class="dots-label en">{y.year}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section section-alt">
+    <div class="container">
+      <SectionHead num="01" en="Student publications" ja="学生の論文・研究発表" />
+      {publicationsByYear.map((y) => (
+        <div class="year">
+          <p class="year-label en">{y.year}</p>
+          <ol class="pubs" role="list">
+            {y.list.map((p) => (
+              <li class={`pub pos-${catPos(p.type)}`} id={ids.get(p)} data-reveal>
+                <p class="pub-meta"><span class="tag">{p.type}</span></p>
+                <p class="pub-title" lang={isEnglish(p.title) ? 'en' : undefined}>{p.title}</p>
+                <p class="pub-authors" lang={isEnglish(p.authors) ? 'en' : undefined}>{p.authors}</p>
+                <p class="pub-venue">{p.venue}</p>
+                {p.url && (
+                  <a class="pub-link" href={p.url} target="_blank" rel="noopener">
+                    {p.url.includes('doi.org') ? 'DOI' : 'リンク'}<Arrow kind="out" size={13} />
+                  </a>
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <a class="rmap" href={site.professor.links.researchmap} target="_blank" rel="noopener">
+        <span class="mono">Faculty publications</span>
+        <span class="rmap-title">教員の研究業績は researchmap へ</span>
+        <span class="rmap-go"><Arrow kind="out" size={22} /></span>
+      </a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .summary { padding-block: clamp(3rem, 6vw, 4.5rem); }
+  .summary-grid { display: grid; gap: 2.5rem; align-items: end; }
+  @media (min-width: 56rem) { .summary-grid { grid-template-columns: 1fr 1fr; } }
+  .count-all { font-weight: 700; }
+  .count-all .en { font-size: clamp(4rem, 10vw, 7rem); font-weight: 800; line-height: .9; margin-right: .25rem; color: var(--ink); }
+  .count-types { display: grid; gap: .6rem; margin-top: 1.5rem; max-width: 26rem; }
+  .count-types li { display: grid; grid-template-columns: 1fr auto; gap: .3rem 1rem; align-items: center; font-weight: 700; }
+  .count-types b { font-size: 1.2rem; }
+  .count-bar {
+    grid-column: 1 / -1;
+    order: 2;
+    height: .5rem;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--c) calc(var(--n) / var(--max) * 100%), var(--paper-2) 0);
+  }
+
+  .dots { display: flex; align-items: flex-end; gap: 1.5rem; min-height: 12rem; padding-bottom: .25rem; border-bottom: 2px solid var(--ink); }
+  .dots-year { display: grid; justify-items: center; gap: .6rem; }
+  .dots-stack { display: flex; flex-direction: column-reverse; gap: .45rem; }
+  .dot {
+    display: block;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--c);
+    transition: transform .3s var(--ease);
+  }
+  .dot:hover { transform: scale(1.2); }
+  .dots-label { font-weight: 700; font-size: .95rem; transform: translateY(2.2rem); }
+
+  .year { display: grid; gap: 1rem; }
+  .year + .year { margin-top: 3rem; }
+  @media (min-width: 56rem) {
+    .year { grid-template-columns: 10rem 1fr; gap: 2rem; }
+    .year-label { position: sticky; top: calc(var(--header-h) + 2rem); align-self: start; }
+  }
+  .year-label { font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 800; line-height: 1; color: var(--ink); }
+  .pubs { display: grid; gap: 1rem; }
+  .pub {
+    position: relative;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    padding-left: calc(clamp(1.5rem, 3vw, 2rem) + 6px);
+    border-radius: var(--radius);
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+  .pub::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--c); }
+  .pub:target { outline: 2px solid var(--c); }
+  .pub-title { margin-top: .8rem; font-size: clamp(1.05rem, 1.6vw, 1.2rem); font-weight: 700; line-height: 1.6; color: var(--ink); }
+  .pub-title:lang(en) { font-family: var(--font-en); letter-spacing: -.005em; }
+  .pub-authors { margin-top: .5rem; font-size: .9rem; color: var(--text); }
+  .pub-venue { margin-top: .2rem; font-size: .85rem; color: var(--muted); }
+  .pub-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: 1rem;
+    padding: .3rem .9rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color .3s;
+  }
+  .pub-link:hover { background: var(--c); }
+
+  .rmap {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: .5rem 1rem;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border-radius: var(--radius-lg);
+    background: var(--night);
+    color: #fff;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .rmap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(50% 120% at 100% 100%, color-mix(in srgb, var(--aux) 55%, transparent), transparent 70%);
+    transition: opacity .4s;
+    opacity: .6;
+  }
+  .rmap:hover::before { opacity: 1; }
+  .rmap .mono { grid-column: 1 / -1; font-size: .8rem; color: var(--on-night-muted); }
+  .rmap-title { font-size: clamp(1.4rem, 3.4vw, 2.6rem); font-weight: 900; line-height: 1.35; }
+  .rmap-go { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #fff; color: var(--ink); transition: transform .4s var(--ease); }
+  .rmap:hover .rmap-go { transform: translate(3px, -3px); }
+</style>

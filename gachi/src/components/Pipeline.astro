@@ -1,0 +1,481 @@
+---
+// 研究内容ページの「データ分析の工程」。
+// 左の説明をスクロールすると、右の図の中でデータが姿を変えていきます。
+//   散らばったことば → 表（構造化データ）→ 数値（特徴量）→ 点と線（モデル・可視化）→ まとまり（知見）
+// 工程の文言は content/research.yaml の pipeline です。
+// 図の中のことばは表示用の例で、実際の分析結果ではありません。
+import { site, research, pad2 } from '../lib/data';
+import Arrow from './Arrow.astro';
+
+const stages = research.pipeline ?? [];
+const pool = [
+  ...(stages[0]?.chips ?? []), ...site.graphic_words,
+  '会話', '歌詞', '翻訳', '推し', 'ととのう', '落語', '印象', '態度', '信頼', '英語', '感情', '評価', '文化', '動機',
+];
+const words = [...new Set(pool)].slice(0, 24);
+---
+{stages.length > 0 && (
+  <div class="pipe" data-pipe data-words={JSON.stringify(words)}>
+    <div class="pipe-visual">
+      <div class="pipe-screen">
+        <canvas data-pipe-canvas aria-hidden="true"></canvas>
+        <div class="pipe-hud mono" aria-hidden="true">
+          <span class="pipe-hud-num" data-pipe-num>01</span>
+          <span class="pipe-hud-total">/ {pad2(stages.length)}</span>
+          <span class="pipe-hud-label" data-pipe-label>{stages[0].box}</span>
+        </div>
+        <div class="pipe-bar" aria-hidden="true"><span data-pipe-bar></span></div>
+      </div>
+    </div>
+
+    <ol class="pipe-steps" role="list">
+      {stages.map((s, i) => (
+        <li class="pipe-step" data-step>
+          <div class="pipe-card">
+            <p class="pipe-idx mono">STEP {pad2(i + 1)}</p>
+            <h3 class="pipe-box">{s.box}</h3>
+            {s.detail && <p class="pipe-detail">{s.detail}</p>}
+            {s.chips && (
+              <ul class="pipe-chips" role="list">{s.chips.map((c) => <li>{c}</li>)}</ul>
+            )}
+          </div>
+          {s.arrow && i < stages.length - 1 && (
+            <p class="pipe-arrow"><Arrow kind="down" size={15} /><span>{s.arrow}</span></p>
+          )}
+        </li>
+      ))}
+    </ol>
+  </div>
+)}
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-pipe]');
+  if (root) initPipe(root);
+
+  function initPipe(root: HTMLElement) {
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-pipe-canvas]')!;
+    const ctx = canvas.getContext('2d')!;
+    const words: string[] = JSON.parse(root.dataset.words || '[]');
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const numEl = root.querySelector<HTMLElement>('[data-pipe-num]')!;
+    const labelEl = root.querySelector<HTMLElement>('[data-pipe-label]')!;
+    const barEl = root.querySelector<HTMLElement>('[data-pipe-bar]')!;
+    const labels = steps.map((s) => s.querySelector('.pipe-box')?.textContent ?? '');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    type RGBA = [number, number, number, number];
+    type Item = { x: number; y: number; w: number; h: number; r: number; rot: number; fill: RGBA; stroke: RGBA; wordA: number; numA: number };
+
+    const css = getComputedStyle(document.documentElement);
+    const rgb = (name: string): [number, number, number] => {
+      const h = css.getPropertyValue(name).trim();
+      return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+    };
+    const COLORS = [rgb('--noun'), rgb('--verb'), rgb('--particle')];
+    const W0 = 1000;
+    const H0 = 720;
+    const N = words.length;
+    const STATES = 5;
+
+    let seed = 5;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+    const group = words.map((_, i) => i % 3);
+    const vals = words.map(() => 0.15 + rnd() * 0.85);
+    const jitter = words.map(() => [rnd(), rnd(), rnd(), rnd()]);
+
+    const WORD_FONT = '700 23px "Zen Kaku Gothic New", sans-serif';
+    const NUM_FONT = '500 21px "M PLUS 1 Code", monospace';
+    const MONO_FONT = '500 15px "M PLUS 1 Code", monospace';
+
+    let states: Item[][] = [];
+    let edges: [number, number][] = [];
+    const centers = [[290, 330], [705, 255], [585, 555]];
+
+    const build = () => {
+      ctx.font = WORD_FONT;
+      const s0: Item[] = [];
+      const s1: Item[] = [];
+      const s2: Item[] = [];
+      const s3: Item[] = [];
+      const s4: Item[] = [];
+      const cols = 4;
+      const cw = 195;
+      const ch = 72;
+      const tx = (W0 - cols * cw) / 2;
+      const ty = 170;
+      words.forEach((word, i) => {
+        const [a, b, c, d] = jitter[i];
+        const col = COLORS[group[i]];
+        // 0：散らばったことば
+        const gx = i % 5;
+        const gy = Math.floor(i / 5);
+        s0.push({
+          x: 115 + gx * 192 + (a - 0.5) * 70, y: 105 + gy * 128 + (b - 0.5) * 50,
+          w: ctx.measureText(word).width + 44, h: 46, r: 23, rot: (c - 0.5) * 0.28,
+          fill: [...col, 0.2], stroke: [...col, 0.95], wordA: 1, numA: 0,
+        });
+        // 1：表に整う
+        const x = tx + (i % cols) * cw + cw / 2;
+        const y = ty + Math.floor(i / cols) * ch + ch / 2;
+        s1.push({
+          x, y, w: cw - 14, h: ch - 16, r: 8, rot: 0,
+          fill: [255, 255, 255, 0.06], stroke: [255, 255, 255, 0.16], wordA: 1, numA: 0,
+        });
+        // 2：数値になる（色の濃さ＝値の大きさ）
+        s2.push({
+          x, y, w: cw - 14, h: ch - 16, r: 8, rot: 0,
+          fill: [...col, 0.12 + vals[i] * 0.78], stroke: [...col, 0], wordA: 0, numA: 1,
+        });
+        // 3：点になり、似たもの同士が集まる
+        const [cx, cy] = centers[group[i]];
+        const ang = d * Math.PI * 2;
+        const rad = 35 + a * 115;
+        s3.push({
+          x: cx + Math.cos(ang) * rad, y: cy + Math.sin(ang) * rad * 0.85,
+          w: 22, h: 22, r: 11, rot: 0,
+          fill: [...col, 0.95], stroke: [255, 255, 255, 0], wordA: 0, numA: 0,
+        });
+        // 4：まとまり（構造）が見える
+        s4.push({
+          x: cx + Math.cos(ang) * rad * 0.55, y: cy + Math.sin(ang) * rad * 0.5,
+          w: 18, h: 18, r: 9, rot: 0,
+          fill: [...col, 1], stroke: [255, 255, 255, 0.9], wordA: 0, numA: 0,
+        });
+      });
+      states = [s0, s1, s2, s3, s4];
+      edges = [];
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          if (group[i] !== group[j]) continue;
+          if (Math.hypot(s3[i].x - s3[j].x, s3[i].y - s3[j].y) < 150) edges.push([i, j]);
+        }
+      }
+    };
+
+    // 各状態での「表の枠」「軸」「線」「まとまり」の濃さ
+    const LAYERS = {
+      table: [0, 1, 1, 0, 0],
+      axes: [0, 0, 0, 1, 0.3],
+      edges: [0, 0, 0, 0.45, 0.85],
+      hulls: [0, 0, 0, 0, 1],
+    };
+
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const mix = (a: RGBA, b: RGBA, t: number): RGBA => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t), lerp(a[3], b[3], t)];
+    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const rgba = (c: RGBA) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${c[3].toFixed(3)})`;
+
+    const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    };
+
+    let cssW = 0;
+    let cssH = 0;
+    const resize = () => {
+      const box = canvas.getBoundingClientRect();
+      cssW = box.width;
+      cssH = box.height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+    };
+
+    const render = (p: number) => {
+      const dpr = canvas.width / (cssW || 1);
+      const s = Math.min(cssW / W0, cssH / H0);
+      const ox = (cssW - W0 * s) / 2;
+      const oy = (cssH - H0 * s) / 2;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * ox, dpr * oy);
+
+      const a = Math.floor(p);
+      const b = Math.min(a + 1, STATES - 1);
+      const t = reduce ? Math.round(p - a) : ease(p - a);
+      const layer = (k: keyof typeof LAYERS) => lerp(LAYERS[k][a], LAYERS[k][b], t);
+      const items = states[a].map((it, i) => {
+        const o = states[b][i];
+        return {
+          x: lerp(it.x, o.x, t), y: lerp(it.y, o.y, t), w: lerp(it.w, o.w, t), h: lerp(it.h, o.h, t),
+          r: lerp(it.r, o.r, t), rot: lerp(it.rot, o.rot, t),
+          fill: mix(it.fill, o.fill, t), stroke: mix(it.stroke, o.stroke, t),
+          wordA: lerp(it.wordA, o.wordA, t), numA: lerp(it.numA, o.numA, t),
+        };
+      });
+
+      // 表の枠と見出し
+      const ta = layer('table');
+      if (ta > 0.01) {
+        const cols = 4;
+        const cw = 195;
+        const tx = (W0 - cols * cw) / 2;
+        const rows = Math.ceil(N / cols);
+        ctx.globalAlpha = ta;
+        ctx.fillStyle = 'rgba(255,255,255,.08)';
+        roundRect(tx, 112, cols * cw, 46, 10);
+        ctx.fill();
+        ctx.font = MONO_FONT;
+        ctx.fillStyle = 'rgba(200,208,240,.9)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ['id', 'text', 'score', 'group'].forEach((h, i) => ctx.fillText(h, tx + i * cw + cw / 2, 135));
+        ctx.strokeStyle = 'rgba(255,255,255,.08)';
+        ctx.lineWidth = 1;
+        for (let r = 0; r <= rows; r++) {
+          ctx.beginPath();
+          ctx.moveTo(tx, 170 + r * 72);
+          ctx.lineTo(tx + cols * cw, 170 + r * 72);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      // 軸
+      const aa = layer('axes');
+      if (aa > 0.01) {
+        ctx.globalAlpha = aa;
+        ctx.strokeStyle = 'rgba(200,208,240,.45)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(90, 60);
+        ctx.lineTo(90, 660);
+        ctx.lineTo(930, 660);
+        ctx.stroke();
+        ctx.font = MONO_FONT;
+        ctx.fillStyle = 'rgba(200,208,240,.75)';
+        ctx.textAlign = 'left';
+        ctx.fillText('dim 1 →', 810, 690);
+        ctx.save();
+        ctx.translate(62, 150);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('dim 2 →', 0, 0);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      }
+
+      // まとまり（知見）
+      const ha = layer('hulls');
+      if (ha > 0.01) {
+        centers.forEach(([cx, cy], g) => {
+          const col = COLORS[g];
+          const grd = ctx.createRadialGradient(cx, cy, 10, cx, cy, 150);
+          grd.addColorStop(0, `rgba(${col},${0.32 * ha})`);
+          grd.addColorStop(1, `rgba(${col},0)`);
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 150, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.setLineDash([6, 8]);
+          ctx.strokeStyle = `rgba(${col},${0.8 * ha})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 108, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        });
+      }
+
+      // 線（つながり）
+      const ea = layer('edges');
+      if (ea > 0.01) {
+        ctx.lineWidth = 1.2;
+        for (const [i, j] of edges) {
+          const col = COLORS[group[i]];
+          ctx.strokeStyle = `rgba(${col},${0.55 * ea})`;
+          ctx.beginPath();
+          ctx.moveTo(items[i].x, items[i].y);
+          ctx.lineTo(items[j].x, items[j].y);
+          ctx.stroke();
+        }
+      }
+
+      // データそのもの
+      items.forEach((it, i) => {
+        ctx.save();
+        ctx.translate(it.x, it.y);
+        ctx.rotate(it.rot);
+        roundRect(-it.w / 2, -it.h / 2, it.w, it.h, it.r);
+        ctx.fillStyle = rgba(it.fill);
+        ctx.fill();
+        if (it.stroke[3] > 0.01) {
+          ctx.strokeStyle = rgba(it.stroke);
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        if (it.wordA > 0.01) {
+          ctx.font = WORD_FONT;
+          ctx.fillStyle = `rgba(245,247,255,${it.wordA})`;
+          ctx.fillText(words[i], 0, 1);
+        }
+        if (it.numA > 0.01) {
+          ctx.font = NUM_FONT;
+          ctx.fillStyle = `rgba(255,255,255,${it.numA})`;
+          ctx.fillText(vals[i].toFixed(2), 0, 1);
+        }
+        ctx.restore();
+      });
+    };
+
+    // スクロール位置 → 何番目の工程か（小数で）
+    let last = -1;
+    const update = () => {
+      const mid = window.innerHeight * (window.innerWidth >= 1024 ? 0.5 : 0.75);
+      const first = steps[0].getBoundingClientRect();
+      const lastBox = steps[steps.length - 1].getBoundingClientRect();
+      const c0 = first.top + first.height / 2;
+      const c1 = lastBox.top + lastBox.height / 2;
+      const prog = Math.min(1, Math.max(0, (mid - c0) / Math.max(1, c1 - c0)));
+      const p = prog * (steps.length - 1);
+      const visual = steps.length > 1 ? (p / (steps.length - 1)) * (STATES - 1) : 0;
+      if (Math.abs(visual - last) > 0.0005) {
+        last = visual;
+        render(visual);
+      }
+      const active = Math.round(p);
+      numEl.textContent = String(active + 1).padStart(2, '0');
+      labelEl.textContent = labels[active];
+      barEl.style.transform = `scaleX(${prog})`;
+      steps.forEach((s, i) => s.classList.toggle('is-active', i === active));
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; update(); });
+    };
+
+    const start = () => {
+      build();
+      resize();
+      last = -1;
+      update();
+    };
+    start();
+    document.fonts?.ready.then(start);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    new ResizeObserver(() => { resize(); last = -1; update(); }).observe(canvas);
+  }
+</script>
+
+<style>
+  .pipe { display: grid; gap: 0; }
+  .pipe-visual {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 2;
+    padding-block: .75rem;
+    background: var(--paper);
+  }
+  .pipe-screen {
+    position: relative;
+    height: 44svh;
+    min-height: 16rem;
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(60% 60% at 70% 30%, rgba(61, 94, 255, .22), transparent 70%),
+      var(--night);
+    overflow: hidden;
+  }
+  .pipe-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, .08) 1px, transparent 1.2px);
+    background-size: 22px 22px;
+  }
+  .pipe-screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pipe-hud {
+    position: absolute;
+    left: 1.1rem;
+    top: .9rem;
+    display: flex;
+    align-items: baseline;
+    gap: .45rem;
+    color: var(--on-night-muted);
+    font-size: .75rem;
+  }
+  .pipe-hud-num { font-size: 1.1rem; font-weight: 700; color: #fff; }
+  .pipe-hud-label { margin-left: .5rem; color: #fff; font-family: var(--font-ja); font-weight: 700; font-size: .85rem; }
+  .pipe-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .08); }
+  .pipe-bar span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--noun), var(--verb), var(--particle));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .pipe-steps { position: relative; z-index: 1; }
+  .pipe-step {
+    min-height: 62svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 2rem;
+  }
+  .pipe-step:first-child { min-height: 40svh; justify-content: flex-start; }
+  .pipe-step:last-child { min-height: 50svh; }
+  .pipe-card {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--radius);
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    opacity: .45;
+    transform: scale(.97);
+    transition: opacity .5s var(--ease), transform .5s var(--ease), border-color .5s;
+  }
+  .is-active .pipe-card { opacity: 1; transform: none; border-color: var(--ink); }
+  .pipe-idx { font-size: .75rem; color: var(--muted); }
+  .pipe-box { margin-top: .4rem; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 900; }
+  .pipe-detail { margin-top: .5rem; color: var(--muted); }
+  .pipe-chips { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .9rem; }
+  .pipe-chips li {
+    padding: .15rem .8rem;
+    border-radius: 999px;
+    background: var(--paper-2);
+    font-size: .85rem;
+    font-weight: 700;
+  }
+  .pipe-arrow {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin: 1.25rem 0 0 1.25rem;
+    padding: .55rem 1rem;
+    align-self: flex-start;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    font-size: .88rem;
+    font-weight: 700;
+  }
+
+  @media (min-width: 64rem) {
+    .pipe { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 3.5rem; align-items: start; }
+    .pipe-visual {
+      order: 2;
+      top: calc(var(--header-h) + 5vh);
+      padding: 0;
+      background: none;
+    }
+    .pipe-screen { height: calc(100svh - var(--header-h) - 10vh); max-height: 44rem; }
+    .pipe-steps { order: 1; }
+    .pipe-step { min-height: 78svh; }
+    .pipe-step:first-child { min-height: 70svh; justify-content: center; }
+    .pipe-step:last-child { min-height: 70svh; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pipe-card { transition: none; }
+  }
+</style>

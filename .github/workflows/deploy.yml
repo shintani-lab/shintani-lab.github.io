@@ -29,6 +29,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # 新デザイン（gachi/ フォルダ）を、比較用に /gachi/ の下へ公開します。
+      # 新デザインを本番にするときは、gachi/HANDOVER.md の「新デザインを本番にする場合」を見てください。
+      - name: Build gachi (comparison)
+        run: npx astro build --root gachi
+        env:
+          GACHI_BASE: /gachi/
+      - run: cp -r gachi/dist dist/gachi
       - uses: actions/upload-pages-artifact@v5
         with:
           path: ./dist

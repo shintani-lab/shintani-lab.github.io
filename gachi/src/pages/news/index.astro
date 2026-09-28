@@ -1,0 +1,146 @@
+---
+// お知らせ一覧（種類で絞り込めます）
+import Layout from '../../layouts/Layout.astro';
+import PageHead from '../../components/PageHead.astro';
+import Arrow from '../../components/Arrow.astro';
+import { formatDot } from '../../lib/format';
+import { news, url } from '../../lib/data';
+import { titles, catPos } from '../../lib/lang';
+
+const cats = [...new Set(news.map((n) => n.category))].map((c) => ({
+  name: c, n: news.filter((x) => x.category === c).length,
+}));
+const years = [...new Set(news.map((n) => n.date.getFullYear()))].map((y) => ({
+  year: y, list: news.filter((n) => n.date.getFullYear() === y),
+}));
+---
+<Layout title="お知らせ" description="認知言語学・言語データ分析研究室のお知らせです。">
+  <PageHead tokens={titles.news} en="News" />
+
+  <section class="section">
+    <div class="container">
+      <div class="filters" data-filters hidden>
+        <button type="button" class="chip is-on" data-cat="" aria-pressed="true">すべて<span class="en">{news.length}</span></button>
+        {cats.map((c) => (
+          <button type="button" class={`chip pos-${catPos(c.name)}`} data-cat={c.name} aria-pressed="false">
+            <i></i>{c.name}<span class="en">{c.n}</span>
+          </button>
+        ))}
+      </div>
+
+      {years.map((y) => (
+        <div class="year" data-year>
+          <p class="year-label en">{y.year}</p>
+          <ul class="list" role="list">
+            {y.list.map((n) => (
+              <li data-item data-cat={n.category}>
+                <a class={`row pos-${catPos(n.category)}`} href={url(`/news/${n.id}/`)}>
+                  <span class="row-date mono">{n.date_label ?? formatDot(n.date)}</span>
+                  <span class="tag">{n.category}</span>
+                  <span class="row-title">{n.title}</span>
+                  <span class="row-go"><Arrow /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const box = document.querySelector<HTMLElement>('[data-filters]');
+  if (box) {
+    box.hidden = false;
+    const chips = [...box.querySelectorAll<HTMLButtonElement>('button')];
+    const items = [...document.querySelectorAll<HTMLElement>('[data-item]')];
+    const years = [...document.querySelectorAll<HTMLElement>('[data-year]')];
+    box.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!btn) return;
+      const cat = btn.dataset.cat ?? '';
+      chips.forEach((c) => {
+        const on = c === btn;
+        c.classList.toggle('is-on', on);
+        c.setAttribute('aria-pressed', String(on));
+      });
+      items.forEach((it) => { it.hidden = !!cat && it.dataset.cat !== cat; });
+      years.forEach((y) => { y.hidden = !y.querySelector('[data-item]:not([hidden])'); });
+    });
+  }
+</script>
+
+<style>
+  .filters { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem 1rem;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: background-color .3s, color .3s, border-color .3s;
+  }
+  .chip i { width: .55rem; height: .55rem; border-radius: 50%; background: var(--c); }
+  .chip .en { font-size: .78rem; color: var(--muted); }
+  .chip:hover { border-color: var(--ink); }
+  .chip.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .chip.is-on .en { color: rgba(255, 255, 255, .7); }
+
+  .year { display: grid; gap: .5rem; }
+  .year + .year { margin-top: 3rem; }
+  @media (min-width: 56rem) {
+    .year { grid-template-columns: 9rem 1fr; gap: 2rem; }
+    .year-label { position: sticky; top: calc(var(--header-h) + 1.5rem); align-self: start; }
+  }
+  .year-label { font-size: clamp(2.6rem, 5vw, 4rem); font-weight: 800; line-height: 1; color: var(--ink); }
+  .list { border-top: 2px solid var(--ink); }
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 8rem 6rem 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.4rem .5rem;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    isolation: isolate;
+    transition: padding .4s var(--ease);
+  }
+  .row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--c) 9%, transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .45s var(--ease);
+  }
+  .row:hover::before { transform: none; }
+  .row:hover { padding-left: 1.25rem; }
+  .row .tag { justify-self: start; }
+  .row-date { font-size: .88rem; color: var(--muted); }
+  .row-title { font-weight: 700; font-size: 1.05rem; line-height: 1.7; color: var(--ink); }
+  .row-go {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    transition: background-color .3s, color .3s, border-color .3s;
+  }
+  .row:hover .row-go { background: var(--c); border-color: var(--c); color: #fff; }
+  @media (max-width: 47.99rem) {
+    .row { grid-template-columns: auto 1fr auto; gap: .4rem .75rem; }
+    .row-title { grid-column: 1 / 3; }
+    .row-go { grid-column: 3; grid-row: 1 / 3; }
+  }
+</style>

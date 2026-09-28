@@ -1,0 +1,20 @@
+---
+// 名前の文字から作るアイコン（顔写真の代わり）。同じ名前からは必ず同じ模様になります。
+import { identicon } from '../lib/lang';
+
+interface Props { name: string; size?: number }
+const { name, size = 56 } = Astro.props;
+const { cells, color } = identicon(name);
+---
+<svg class={`identicon pos-${color}`} width={size} height={size} viewBox="0 0 70 70" aria-hidden="true" focusable="false">
+  <rect width="70" height="70" rx="16" class="bg" />
+  {cells.flatMap((row, r) => row.map((on, c) => on && (
+    <rect x={10 + c * 10} y={10 + r * 10} width="9" height="9" rx="2" class="px" />
+  )))}
+</svg>
+
+<style>
+  .identicon { display: block; flex: none; }
+  .bg { fill: color-mix(in srgb, var(--c) 12%, #fff); }
+  .px { fill: var(--c); }
+</style>

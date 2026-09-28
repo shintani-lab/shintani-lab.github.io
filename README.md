@@ -3,6 +3,7 @@
 芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）の公式Webサイトです。
 
 - **公開サイト** https://shintani-lab.github.io/
+- **新デザイン案（比較用）** https://shintani-lab.github.io/gachi/ （検索結果には出ません。詳しくは [gachi/HANDOVER.md](./gachi/HANDOVER.md)）
 - **大学公式の研究室ページ** https://www.shibaura-it.ac.jp/faculty/laboratory/00146.html
 
 ## 更新のしかた
@@ -22,6 +23,7 @@
 │   ├── publications.yaml       業績
 │   └── news/                   お知らせ（1記事1ファイル）
 ├── public/                 画像など（favicon・OGP画像・robots.txt）
+├── gachi/                  新デザイン案（文章・写真は content/・public/ を共有）
 ├── src/                    サイトの見た目（通常は触りません）
 │   ├── layouts/Base.astro      全ページ共通のヘッダー・フッター
 │   ├── components/             共通部品（見出し帯・News一覧）

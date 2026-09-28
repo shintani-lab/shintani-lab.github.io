@@ -1,0 +1,539 @@
+---
+// トップの冒頭：キャッチコピーを形態素に分け、品詞と係り受けを描いて見せます。
+// 解析結果は lib/lang.ts の heroParse（手作業で作成）。
+// キャッチコピーが書き換えられて一致しなくなった場合は、普通の見出しとして表示します。
+import { site, news, url } from '../lib/data';
+import { parseFor, POS } from '../lib/lang';
+import { formatDot } from '../lib/format';
+import Arrow from './Arrow.astro';
+
+const chunks = parseFor(site.catchcopy.main);
+const tokenCount = chunks ? chunks.reduce((n, c) => n + c.tokens.length, 0) : 0;
+const latest = news[0];
+const legend = ['noun', 'verb', 'particle', 'aux', 'suffix', 'symbol'] as const;
+let idx = 0;
+---
+<section class="hero" data-hero>
+  <div class="hero-bg" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <div class="container hero-head">
+    <p class="hero-affil">{site.professor.affiliation}</p>
+    <h1 class="hero-lab">
+      {site.lab.name_ja}
+      <span class="hero-lab-en en" lang="en">{site.lab.name_en}</span>
+    </h1>
+  </div>
+
+  {chunks ? (
+    <figure class="parse" data-parse data-text={site.catchcopy.main}
+            data-tokens={tokenCount} data-chunks={chunks.length}>
+      <p class="sr-only">{site.catchcopy.main}</p>
+      <div class="parse-sent" data-sent aria-hidden="true">
+        <svg class="parse-arcs" data-arcs></svg>
+        {chunks.map((c, ci) => (
+          <span class="chunk" data-chunk={ci} data-head={c.head}>
+            {c.tokens.map((t) => {
+              const i = idx++;
+              return (
+                <span
+                  class={`tok pos-${t.pos}`}
+                  style={`--i:${i}`}
+                  data-s={t.s}
+                  data-pos={POS[t.pos] + (t.sub ? `（${t.sub}）` : '')}
+                  data-base={t.base ?? t.s}
+                  data-reading={t.reading ?? '—'}
+                  data-form={t.form ?? ''}
+                >
+                  <span class="tok-s">{t.s}</span>
+                  <span class="tok-p">{POS[t.pos]}</span>
+                </span>
+              );
+            })}
+          </span>
+        ))}
+      </div>
+      <div class="parse-tip" data-tip hidden></div>
+
+      <figcaption class="parse-foot container">
+        <div class="parse-log mono" data-log aria-hidden="true"></div>
+        <div class="parse-note">
+          <p>
+            キャッチコピーを形態素（意味をもつ最小の単位）に分け、品詞と、文節どうしの係り受けを描いています。
+            <span class="hover-hint">語にカーソルを合わせると、原形や読みが出ます。</span>
+          </p>
+          <ul class="parse-legend mono" role="list">
+            {legend.map((k) => <li class={`pos-${k}`}><span></span>{POS[k]}</li>)}
+          </ul>
+        </div>
+      </figcaption>
+    </figure>
+  ) : (
+    <div class="container"><p class="hero-copy">{site.catchcopy.main}</p></div>
+  )}
+
+  <div class="container hero-actions">
+    <a class="btn btn-white" href={url('/research/')}>研究内容を見る<Arrow /></a>
+    <a class="btn btn-ghost" href={url('/join/')}>配属を検討している方へ</a>
+    {chunks && <button class="replay mono" type="button" data-replay>↻ もう一度解析する</button>}
+  </div>
+
+  {latest && (
+    <div class="hero-news-wrap">
+      <a class="container hero-news" href={url(`/news/${latest.id}/`)}>
+        <span class="hero-news-label mono">NEW</span>
+        <span class="hero-news-date mono">{latest.date_label ?? formatDot(latest.date)}</span>
+        <span class="hero-news-title">{latest.title}</span>
+        <Arrow />
+      </a>
+    </div>
+  )}
+</section>
+
+<script>
+  const fig = document.querySelector<HTMLElement>('[data-parse]');
+  if (fig) initParse(fig);
+
+  function initParse(fig: HTMLElement) {
+    const sent = fig.querySelector<HTMLElement>('[data-sent]')!;
+    const svg = fig.querySelector<SVGSVGElement>('[data-arcs]')!;
+    const tip = fig.querySelector<HTMLElement>('[data-tip]')!;
+    const log = fig.querySelector<HTMLElement>('[data-log]')!;
+    const chunks = [...sent.querySelectorAll<HTMLElement>('.chunk')];
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const NS = 'http://www.w3.org/2000/svg';
+    let timers: number[] = [];
+
+    const lines = [
+      `$ parse "${fig.dataset.text}"`,
+      `形態素解析   → ${fig.dataset.tokens} 形態素`,
+      `係り受け解析 → ${fig.dataset.chunks} 文節`,
+      `可視化       → 完了`,
+    ];
+
+    // ---- ログを1文字ずつ打ち込む ----
+    const type = (line: string, done = false) => {
+      const row = document.createElement('p');
+      log.append(row);
+      if (done || reduce) { row.textContent = line; return; }
+      let n = 0;
+      const step = () => {
+        row.textContent = line.slice(0, ++n);
+        if (n < line.length) timers.push(window.setTimeout(step, 14));
+      };
+      step();
+    };
+
+    // ---- 係り受けの弧を描く ----
+    const draw = (animate: boolean) => {
+      svg.replaceChildren();
+      const base = sent.getBoundingClientRect();
+      const boxes = chunks.map((c) => {
+        const words = [...c.querySelectorAll<HTMLElement>('.tok-s')].map((w) => w.getBoundingClientRect());
+        const left = Math.min(...words.map((r) => r.left)) - base.left;
+        const right = Math.max(...words.map((r) => r.right)) - base.left;
+        const top = Math.min(...words.map((r) => r.top)) - base.top;
+        const bottom = Math.max(...words.map((r) => r.bottom)) - base.top;
+        return { left, right, top, bottom, cx: (left + right) / 2, cy: (top + bottom) / 2 };
+      });
+      const horizontal = Math.abs(boxes[0].top - boxes[boxes.length - 1].top) < 8;
+      const size = parseFloat(getComputedStyle(sent).fontSize);
+      const incoming = new Map<number, number>();
+
+      chunks.forEach((c, i) => {
+        const j = Number(c.dataset.head);
+        if (j < 0) return;
+        const a = boxes[i];
+        const b = boxes[j];
+        const k = incoming.get(j) ?? 0;
+        incoming.set(j, k + 1);
+        const dist = Math.abs(j - i);
+        let d: string;
+        let end: [number, number];
+        if (horizontal) {
+          const y = a.top - size * 0.15;
+          const x1 = a.cx + size * 0.12;
+          const x2 = b.cx - size * 0.12 - k * size * 0.22;
+          const h = size * (0.55 + dist * 0.42);
+          d = `M${x1},${y} C${x1},${y - h} ${x2},${y - h} ${x2},${y}`;
+          end = [x2, y];
+        } else {
+          const x1 = a.right + size * 0.25;
+          const x2 = b.right + size * 0.25;
+          const y1 = a.cy;
+          const y2 = b.cy - k * size * 0.18;
+          const X = Math.max(x1, x2) + size * (0.5 + dist * 0.45);
+          d = `M${x1},${y1} C${X},${y1} ${X},${y2} ${x2},${y2}`;
+          end = [x2, y2];
+        }
+        const color = getComputedStyle(c.querySelector('.tok')!).getPropertyValue('--c');
+        const g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'arc');
+        g.dataset.from = String(i);
+        g.dataset.to = String(j);
+        g.style.setProperty('--d', `${i * 160}ms`);
+        const path = document.createElementNS(NS, 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('pathLength', '1');
+        path.setAttribute('stroke', color);
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('cx', String(end[0]));
+        dot.setAttribute('cy', String(end[1]));
+        dot.setAttribute('r', String(Math.max(2.5, size * 0.07)));
+        dot.setAttribute('fill', color);
+        g.append(path, dot);
+        svg.append(g);
+      });
+      if (!animate) fig.classList.add('is-linked');
+    };
+
+    // ---- 解析の演出を最初から ----
+    const run = () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      log.replaceChildren();
+      fig.classList.remove('is-split', 'is-tagged', 'is-linked');
+      svg.replaceChildren();
+      if (reduce) {
+        fig.classList.add('is-split', 'is-tagged');
+        lines.forEach((l) => type(l, true));
+        draw(false);
+        return;
+      }
+      const at = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
+      at(500, () => { type(lines[0]); fig.classList.add('is-split'); });
+      at(1400, () => { type(lines[1]); fig.classList.add('is-tagged'); });
+      at(2600, () => {
+        type(lines[2]);
+        draw(true);
+        requestAnimationFrame(() => requestAnimationFrame(() => fig.classList.add('is-linked')));
+      });
+      at(4000, () => type(lines[3]));
+    };
+
+    document.fonts?.ready.then(run) ?? run();
+    fig.closest('section')?.querySelector('[data-replay]')?.addEventListener('click', run);
+
+    let rt = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(() => { if (fig.classList.contains('is-linked')) draw(false); }, 120);
+    });
+
+    // ---- 語にカーソルを合わせたときの説明 ----
+    const hide = () => {
+      tip.hidden = true;
+      sent.querySelectorAll('.is-hot').forEach((el) => el.classList.remove('is-hot'));
+      fig.classList.remove('is-focus');
+    };
+    sent.addEventListener('pointerover', (e) => {
+      const tok = (e.target as HTMLElement).closest<HTMLElement>('.tok');
+      if (!tok || !fig.classList.contains('is-tagged')) return;
+      hide();
+      const ds = tok.dataset;
+      const rows: [string, string][] = [['品詞', ds.pos!], ['原形', ds.base!], ['読み', ds.reading!]];
+      if (ds.form) rows.push(['活用形', ds.form]);
+      tip.replaceChildren();
+      const head = document.createElement('p');
+      head.className = 'tip-s';
+      head.textContent = ds.s!;
+      tip.append(head);
+      const dl = document.createElement('dl');
+      for (const [k, v] of rows) {
+        const dt = document.createElement('dt');
+        dt.textContent = k;
+        const dd = document.createElement('dd');
+        dd.textContent = v;
+        dl.append(dt, dd);
+      }
+      tip.append(dl);
+      tip.style.setProperty('--c', getComputedStyle(tok).getPropertyValue('--c'));
+      tip.hidden = false;
+
+      const f = fig.getBoundingClientRect();
+      const r = tok.getBoundingClientRect();
+      const x = Math.min(Math.max(r.left + r.width / 2 - f.left, 110), f.width - 110);
+      tip.style.left = `${x}px`;
+      tip.style.top = `${r.bottom - f.top + 10}px`;
+
+      tok.classList.add('is-hot');
+      const ci = tok.closest<HTMLElement>('.chunk')!.dataset.chunk;
+      svg.querySelectorAll<SVGGElement>('.arc').forEach((g) => {
+        if (g.dataset.from === ci || g.dataset.to === ci) g.classList.add('is-hot');
+      });
+      fig.classList.add('is-focus');
+    });
+    sent.addEventListener('pointerleave', hide);
+    document.addEventListener('pointerdown', (e) => {
+      if (!(e.target as HTMLElement).closest('.tok')) hide();
+    });
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    min-height: max(44rem, 100svh);
+    display: flex;
+    flex-direction: column;
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 4vh, 3rem));
+    background: var(--night);
+    color: var(--on-night);
+    overflow: hidden;
+  }
+
+  /* 背景：ゆっくり漂う3色の光と、細かな点の格子 */
+  .hero-bg { position: absolute; inset: 0; z-index: -1; }
+  .hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, .12) 1px, transparent 1.2px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(80% 70% at 50% 45%, #000 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(80% 70% at 50% 45%, #000 30%, transparent 100%);
+  }
+  .hero-bg span {
+    position: absolute;
+    width: 46vmax;
+    height: 46vmax;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: .33;
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  .hero-bg span:nth-child(1) { background: var(--noun); left: -12vmax; top: -14vmax; }
+  .hero-bg span:nth-child(2) { background: var(--verb); right: -16vmax; top: 18%; opacity: .2; animation-duration: 28s; }
+  .hero-bg span:nth-child(3) { background: var(--particle); left: 30%; bottom: -26vmax; opacity: .22; animation-duration: 25s; }
+  @keyframes drift {
+    to { transform: translate(8vmax, 5vmax) scale(1.1); }
+  }
+
+  .hero-affil { font-size: .85rem; color: var(--on-night-muted); letter-spacing: .12em; }
+  .hero-lab {
+    margin-top: .35rem;
+    color: #fff;
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    font-weight: 700;
+    letter-spacing: .08em;
+    line-height: 1.6;
+  }
+  .hero-lab-en { display: block; font-size: .8rem; font-weight: 500; color: var(--on-night-muted); }
+
+  .hero-copy {
+    margin-block: auto;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 900;
+    color: #fff;
+  }
+
+  /* ---------- 解析の図 ---------- */
+  .parse {
+    position: relative;
+    margin-block: auto;
+    padding-block: clamp(2rem, 5vh, 3rem) 0;
+  }
+  .parse-sent {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .55em;
+    width: fit-content;
+    margin-inline: var(--gutter);
+    font-size: clamp(1.75rem, 7.2vw, 2.6rem);
+    font-weight: 900;
+    line-height: 1.15;
+    color: #fff;
+    font-feature-settings: "palt";
+  }
+  @media (min-width: 64rem) {
+    .parse-sent {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0;
+      margin-inline: auto;
+      padding-top: 2.2em;
+      font-size: min(4.4rem, calc((100vw - 2 * var(--gutter)) / 31));
+    }
+    .is-split .chunk + .chunk { margin-left: .42em; }
+    .chunk + .chunk { transition: margin .8s var(--ease); }
+  }
+
+  .parse-arcs {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .parse-arcs :global(.arc path) {
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1s var(--ease), opacity .3s;
+    transition-delay: var(--d);
+  }
+  .parse-arcs :global(.arc circle) {
+    opacity: 0;
+    transition: opacity .4s, r .3s;
+    transition-delay: calc(var(--d) + 700ms);
+  }
+  .is-linked .parse-arcs :global(.arc path) { stroke-dashoffset: 0; }
+  .is-linked .parse-arcs :global(.arc circle) { opacity: 1; }
+  .is-focus .parse-arcs :global(.arc:not(.is-hot)) { opacity: .15; }
+  .parse-arcs :global(.arc.is-hot path) { stroke-width: 3; }
+  .parse-arcs :global(.arc) { transition: opacity .3s; }
+
+  .chunk { display: inline-flex; align-items: flex-start; }
+  .tok {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    cursor: default;
+    transition: margin .6s var(--ease);
+  }
+  .is-split .tok + .tok { margin-left: .09em; }
+  .tok-s { display: block; padding-bottom: .1em; transition: color .3s; }
+  .tok::before {
+    content: "";
+    order: 2;
+    height: max(3px, .07em);
+    border-radius: 99px;
+    background: var(--c);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .6s var(--ease);
+    transition-delay: calc(var(--i) * 45ms);
+  }
+  .tok-p {
+    order: 3;
+    margin-top: .5em;
+    font-family: var(--font-mono);
+    font-size: max(.7rem, .2em);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    /* 暗い背景でも読みやすいよう、品詞の色を少し明るくしています */
+    color: color-mix(in srgb, var(--c) 62%, #fff);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity .5s var(--ease), transform .5s var(--ease);
+    transition-delay: calc(200ms + var(--i) * 45ms);
+  }
+  .is-tagged .tok::before { transform: scaleX(1); }
+  .is-tagged .tok-p { opacity: 1; transform: none; }
+  .tok.is-hot .tok-s { color: var(--c); }
+
+  .parse-tip {
+    position: absolute;
+    z-index: 5;
+    min-width: 12rem;
+    padding: .9rem 1rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .96);
+    color: var(--ink);
+    box-shadow: 0 18px 40px -12px rgba(0, 0, 0, .5);
+    transform: translateX(-50%);
+    border-top: 4px solid var(--c);
+    pointer-events: none;
+  }
+  .parse-tip :global(.tip-s) { font-size: 1.3rem; font-weight: 900; line-height: 1.3; }
+  .parse-tip :global(dl) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .15rem .9rem;
+    margin-top: .5rem;
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    line-height: 1.6;
+  }
+  .parse-tip :global(dt) { color: var(--muted); }
+  .parse-tip :global(dd) { font-weight: 700; }
+
+  .parse-foot {
+    display: grid;
+    gap: 1.5rem 3rem;
+    margin-top: clamp(2rem, 5vh, 3.5rem);
+  }
+  @media (min-width: 56rem) {
+    .parse-foot { grid-template-columns: 1fr 1.1fr; align-items: start; }
+  }
+  .parse-log {
+    min-height: 6.4em;
+    font-size: .78rem;
+    line-height: 1.6;
+    color: var(--on-night-muted);
+    white-space: pre-wrap;
+  }
+  .parse-log :global(p:first-child) { color: #8fa3ff; }
+  .parse-log :global(p:last-child)::after {
+    content: "▍";
+    margin-left: .1em;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .parse-note { font-size: .85rem; color: var(--on-night-muted); line-height: 1.85; }
+  @media (hover: none) { .hover-hint { display: none; } }
+  .parse-legend { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: .75rem; font-size: .75rem; }
+  .parse-legend li { display: inline-flex; align-items: center; gap: .4rem; }
+  .parse-legend span { width: .85rem; height: .3rem; border-radius: 2px; background: var(--c); }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+    margin-top: clamp(2rem, 5vh, 3rem);
+    padding-bottom: clamp(2rem, 5vh, 3rem);
+  }
+  .replay {
+    margin-left: auto;
+    padding: .5rem .9rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .06);
+    color: var(--on-night-muted);
+    font-size: .78rem;
+    cursor: pointer;
+    transition: background-color .3s, color .3s;
+  }
+  .replay:hover { background: rgba(255, 255, 255, .14); color: #fff; }
+
+  .hero-news-wrap { border-top: 1px solid rgba(255, 255, 255, .1); }
+  .hero-news {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 1.1rem;
+    font-size: .88rem;
+    color: var(--on-night-muted);
+    text-decoration: none;
+    transition: color .3s;
+  }
+  .hero-news:hover { color: #fff; }
+  .hero-news-label {
+    flex: none;
+    padding: .05rem .55rem;
+    border-radius: 4px;
+    background: var(--verb);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+  }
+  .hero-news-date { flex: none; font-size: .8rem; }
+  .hero-news-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  @media (max-width: 47.99rem) {
+    .hero-actions .btn { flex: 1 1 100%; justify-content: center; }
+    .replay { margin-left: 0; }
+    .hero-news-date { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg span { animation: none; }
+    .parse-log :global(p:last-child)::after { animation: none; }
+  }
+</style>

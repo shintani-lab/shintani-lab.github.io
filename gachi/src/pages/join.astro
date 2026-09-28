@@ -1,0 +1,205 @@
+---
+// 配属を検討している方へ（Join Us）
+import Layout from '../layouts/Layout.astro';
+import PageHead from '../components/PageHead.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Timetable from '../components/Timetable.astro';
+import Arrow from '../components/Arrow.astro';
+import Icon from '../components/Icon.astro';
+import { iconForField } from '../lib/icons';
+import { site, research, join, career, url } from '../lib/data';
+import { titles, CYCLE } from '../lib/lang';
+
+const admission = join.admission ?? [];
+const photos = join.photos ?? [];
+---
+<Layout title="配属を検討している方へ" description="認知言語学・言語データ分析研究室への配属を検討している方へ。ゼミの実施日、学べる分野、卒業後の進路などをまとめています。">
+  <PageHead tokens={titles.join} en="Join Us">
+    <p class="phead-lead">{research.introduction[2] ?? research.introduction[0]}</p>
+  </PageHead>
+
+  <!-- ============ 学べる分野 ============ -->
+  <section class="section">
+    <div class="container">
+      <SectionHead num="01" en="What you learn" ja="学べる分野" />
+      <ul class="learn" role="list">
+        {research.fields.map((f, i) => (
+          <li class={`pos-${CYCLE[i % CYCLE.length]}`} data-reveal style={`--d:${i * 70}ms`}>
+            <span class="learn-icon"><Icon name={iconForField(f)} size={22} /></span>{f}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ゼミ ============ -->
+  <section class="section section-alt">
+    <div class="container">
+      <SectionHead num="02" en="Seminar" ja="ゼミの実施日" />
+      <div class="seminar">
+        <div class="seminar-text" data-reveal>
+          <p class="seminar-intro">{join.seminar.intro}</p>
+          {join.seminar.note && <p class="seminar-note"><span class="mk pos-suffix">{join.seminar.note}</span></p>}
+        </div>
+        <div class="seminar-tt" data-reveal style="--d:120ms">
+          <Timetable slots={join.seminar.slots} />
+        </div>
+      </div>
+
+      {photos.length > 0 && (
+        <div class="photos">
+          {photos.map((ph, i) => (
+            <figure class="photo" style={`--ar:${ph.width / ph.height}; --tilt:${i % 2 ? 1.6 : -1.4}deg; --d:${i * 140}ms`} data-reveal>
+              <img src={url(ph.src)} width={ph.width} height={ph.height} alt={ph.alt} loading="lazy" decoding="async" />
+              {ph.caption && <figcaption>{ph.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- ============ 大学院進学・留学生 ============ -->
+  {admission.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <SectionHead num="03" en="Graduate / International" ja="大学院進学・留学生の方へ" />
+        <dl class="adm">
+          {admission.map((a, i) => (
+            <div class={`adm-card pos-${CYCLE[(i + 1) % CYCLE.length]}`} data-reveal style={`--d:${i * 100}ms`}>
+              <dt>{a.label}</dt>
+              <dd>{a.body}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  )}
+
+  <!-- ============ 卒業後の進路 ============ -->
+  <section class="section section-alt">
+    <div class="container">
+      <SectionHead num="04" en="Careers" ja="卒業後の進路" />
+      <ul class="careers" role="list">
+        {career.categories.map((c, i) => (
+          <li class={`pos-${CYCLE[i % CYCLE.length]}`} data-reveal style={`--d:${i * 60}ms`}>{c}</li>
+        ))}
+      </ul>
+      {career.note && <p class="careers-note">{career.note}</p>}
+    </div>
+  </section>
+
+  <!-- ============ お問い合わせ ============ -->
+  <section class="section section-night cta">
+    <div class="container cta-inner">
+      <p class="cta-text">ゼミの見学や、研究内容についてのご質問を歓迎しています。</p>
+      <div class="cta-side">
+        <p class="cta-mail en">{site.contact.email_masked}</p>
+        <p class="cta-note">迷惑メール対策のため、◎ を @ に置き換えて送信してください。</p>
+        <a class="btn btn-white" href={url('/contact/')}>連絡先・アクセス<Arrow /></a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .learn { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .learn li {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .7rem 1.4rem .7rem .7rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 1.5px solid color-mix(in srgb, var(--c) 35%, transparent);
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    font-weight: 900;
+    color: var(--ink);
+    transition: background-color .35s, color .35s, transform .35s var(--ease);
+  }
+  .learn li:hover { background: var(--c); color: #fff; transform: translateY(-3px); }
+  .learn-icon {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--c) 14%, #fff);
+    color: var(--c-ink);
+  }
+
+  .seminar { display: grid; gap: 2.5rem; }
+  @media (min-width: 60rem) { .seminar { grid-template-columns: 1fr 1.1fr; gap: 4rem; align-items: start; } }
+  .seminar-intro { font-size: clamp(1.05rem, 1.6vw, 1.2rem); line-height: 2; }
+  .seminar-note { margin-top: 1.5rem; font-size: clamp(1.1rem, 1.8vw, 1.35rem); font-weight: 900; color: var(--ink); }
+  .seminar-tt {
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    box-shadow: var(--shadow);
+  }
+
+  .photos {
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: flex-start;
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .photo {
+    flex: var(--ar) 1 0;
+    min-width: 0;
+    padding: .8rem .8rem 1.2rem;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 20px 40px -18px rgba(12, 15, 29, .35);
+    transition: transform .8s var(--ease), box-shadow .6s var(--ease), opacity 1s var(--ease);
+  }
+  /* 少し傾けて置いた写真（スクロールで現れる動きと両立させるため、指定を強めています） */
+  .photos .photo[data-reveal] { transform: rotate(var(--tilt)); }
+  :global(.js) .photos .photo[data-reveal]:not(.is-in) { transform: rotate(var(--tilt)) translateY(24px); }
+  .photos .photo[data-reveal]:hover { transform: rotate(0deg) scale(1.02); box-shadow: 0 28px 50px -18px rgba(12, 15, 29, .45); }
+  .photo img { width: 100%; border-radius: 2px; }
+  .photo figcaption { margin-top: .9rem; font-size: .88rem; line-height: 1.8; color: var(--text); }
+  @media (max-width: 39.99rem) {
+    .photos { flex-direction: column; }
+    .photo { flex: none; width: 100%; }
+  }
+
+  .adm { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+  .adm-card {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--c) 8%, var(--paper));
+    border-top: 6px solid var(--c);
+  }
+  .adm-card dt { font-size: 1.25rem; font-weight: 900; color: var(--ink); }
+  .adm-card dd { margin-top: .75rem; line-height: 1.95; }
+
+  .careers { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .careers li {
+    padding: .6rem 1.4rem;
+    border-radius: 999px;
+    background: var(--c);
+    color: #fff;
+    font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+    font-weight: 900;
+  }
+  .careers li:nth-child(even) { background: transparent; color: var(--c-ink); box-shadow: inset 0 0 0 2px var(--c); }
+  .careers-note { margin-top: 1.5rem; color: var(--muted); }
+
+  .cta { position: relative; overflow: hidden; isolation: isolate; }
+  .cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(45% 80% at 100% 0%, color-mix(in srgb, var(--verb) 35%, transparent), transparent 70%),
+      radial-gradient(45% 80% at 0% 100%, color-mix(in srgb, var(--particle) 30%, transparent), transparent 70%);
+  }
+  .cta-inner { display: grid; gap: 2rem 4rem; align-items: center; }
+  @media (min-width: 60rem) { .cta-inner { grid-template-columns: 1.4fr 1fr; } }
+  .cta-text { font-size: clamp(1.6rem, 4vw, 3rem); font-weight: 900; line-height: 1.5; color: #fff; word-break: auto-phrase; }
+  .cta-mail { font-size: 1.3rem; font-weight: 700; color: #fff; }
+  .cta-note { margin: .4rem 0 1.5rem; font-size: .82rem; color: var(--on-night-muted); }
+</style>

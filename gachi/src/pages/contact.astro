@@ -1,0 +1,170 @@
+---
+// 連絡先・アクセス
+import Layout from '../layouts/Layout.astro';
+import PageHead from '../components/PageHead.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Arrow from '../components/Arrow.astro';
+import { site } from '../lib/data';
+import { titles } from '../lib/lang';
+
+const loc = site.location;
+const mapUrl = (q: string) =>
+  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+---
+<Layout title="連絡先" description="認知言語学・言語データ分析研究室の連絡先です。ゼミは豊洲キャンパス、教員室は大宮キャンパスにあります。">
+  <PageHead tokens={titles.contact} en="Contact" />
+
+  <section class="section">
+    <div class="container">
+      <SectionHead num="01" en="Access" ja="2つのキャンパス" />
+      <div class="route">
+        <div class="station pos-noun" data-reveal>
+          <span class="st-dot" aria-hidden="true"></span>
+          <p class="st-role mono">ゼミ実施場所</p>
+          <p class="st-name">{loc.seminar.campus}</p>
+          <p class="st-detail">{loc.seminar.address}</p>
+          <a class="st-map" href={mapUrl(`芝浦工業大学 ${loc.seminar.campus}`)} target="_blank" rel="noopener">地図を開く<Arrow kind="out" size={13} /></a>
+        </div>
+        <div class="line" aria-hidden="true"><span></span></div>
+        <div class="station pos-verb" data-reveal style="--d:200ms">
+          <span class="st-dot" aria-hidden="true"></span>
+          <p class="st-role mono">教員所属</p>
+          <p class="st-name">{loc.office.campus}</p>
+          <p class="st-detail">{loc.office.room}</p>
+          <a class="st-map" href={mapUrl(`芝浦工業大学 ${loc.office.campus}`)} target="_blank" rel="noopener">地図を開く<Arrow kind="out" size={13} /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-night mail-sec">
+    <div class="container">
+      <SectionHead num="02" en="E-mail" ja="メールでのお問い合わせ" />
+      <p class="mail-lead">ゼミの見学や、研究内容についてのご質問を歓迎しています。</p>
+      <div class="mail">
+        <p class="mail-addr en" data-mail={site.contact.email_masked}>{site.contact.email_masked}</p>
+        <button type="button" class="btn btn-white mail-copy" data-copy hidden>
+          <span data-copy-label>@ に直してコピー</span>
+        </button>
+      </div>
+      <p class="mail-note">迷惑メール対策のため、◎ を @ に置き換えて送信してください。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHead num="03" en="Links" ja="関連リンク" />
+      <ul class="links" role="list">
+        <li>
+          <a href={site.professor.links.university} target="_blank" rel="noopener">
+            <span><span class="ph">芝浦工業大学</span> <span class="ph">公式サイトの</span><span class="ph">研究室ページ</span></span><Arrow kind="out" size={20} />
+          </a>
+        </li>
+        <li>
+          <a href={site.professor.links.researchmap} target="_blank" rel="noopener">
+            <span>researchmap（{site.professor.name_ja}）</span><Arrow kind="out" size={20} />
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // 表示は「◎」のまま、ボタンを押したときだけ「@」に直してコピーします
+  const btn = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const addr = document.querySelector<HTMLElement>('[data-mail]');
+  const label = document.querySelector<HTMLElement>('[data-copy-label]');
+  if (btn && addr && label && navigator.clipboard) {
+    btn.hidden = false;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText((addr.dataset.mail ?? '').replace('◎', '@').trim());
+        label.textContent = 'コピーしました';
+      } catch {
+        label.textContent = 'コピーできませんでした';
+      }
+      setTimeout(() => { label.textContent = '@ に直してコピー'; }, 2200);
+    });
+  }
+</script>
+
+<style>
+  .route { display: grid; gap: 0; }
+  @media (min-width: 56rem) {
+    .route { grid-template-columns: 1fr minmax(6rem, 1.2fr) 1fr; align-items: start; }
+  }
+  .station { position: relative; padding-left: 3rem; }
+  .st-dot {
+    position: absolute;
+    left: 0;
+    top: .2rem;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 6px solid var(--c);
+  }
+  .st-role { font-size: .8rem; font-weight: 700; color: var(--c-ink); }
+  .st-name { margin-top: .3rem; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; line-height: 1.3; color: var(--ink); }
+  .st-detail { margin-top: .5rem; color: var(--muted); }
+  .st-map {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: 1rem;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--c-ink);
+    text-decoration: none;
+    border-bottom: 1.5px solid currentColor;
+  }
+  .line { position: relative; }
+  .line span { position: absolute; display: block; border-radius: 99px; background: linear-gradient(var(--noun), var(--verb)); }
+  /* スマホ：縦の線 */
+  .line { height: 4.5rem; }
+  .line span { left: .8rem; top: -1rem; bottom: -1.5rem; width: 6px; }
+  .route > .station:first-child { padding-bottom: .5rem; }
+  @media (min-width: 56rem) {
+    .line { height: auto; align-self: start; margin-top: 1.15rem; }
+    .line span {
+      left: -1rem;
+      right: 1.5rem;
+      top: 0;
+      bottom: auto;
+      width: auto;
+      height: 6px;
+      background: linear-gradient(90deg, var(--noun), var(--verb));
+    }
+  }
+
+  .mail-sec { position: relative; overflow: hidden; isolation: isolate; }
+  .mail-sec::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(50% 90% at 100% 100%, color-mix(in srgb, var(--noun) 40%, transparent), transparent 70%);
+  }
+  .mail-lead { color: var(--on-night-muted); margin-top: -1.5rem; }
+  .mail { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem 2rem; margin-top: 2rem; }
+  .mail-addr { font-size: clamp(1.6rem, 5vw, 3.6rem); font-weight: 800; color: #fff; line-height: 1.2; word-break: break-all; }
+  .mail-note { margin-top: 1.25rem; font-size: .85rem; color: var(--on-night-muted); }
+
+  .links { border-top: 2px solid var(--ink); }
+  .links a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem .25rem;
+    border-bottom: 1px solid var(--line);
+    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+    font-weight: 900;
+    color: var(--ink);
+    text-decoration: none;
+    transition: padding .4s var(--ease), color .3s;
+  }
+  .links a:hover { padding-left: 1rem; color: var(--noun-ink); }
+  .ph { display: inline-block; }
+</style>
