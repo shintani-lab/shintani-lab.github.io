@@ -2,14 +2,15 @@
 
 芝浦工業大学 認知言語学・言語データ分析研究室（新谷研）の公式Webサイトです。
 
-- **公開サイト** https://shintani-lab.github.io/
-- **新デザイン案（比較用）** https://shintani-lab.github.io/gachi/ （検索結果には出ません。詳しくは [gachi/HANDOVER.md](./gachi/HANDOVER.md)）
+- **公開サイト** https://shintani-lab.github.io/ （デザインは `gachi/`。2026年9月に切り替え）
 - **大学公式の研究室ページ** https://www.shibaura-it.ac.jp/faculty/laboratory/00146.html
 
 ## 更新のしかた
 
 **サイトの内容を更新したい方は [HANDOVER.md](./HANDOVER.md) をご覧ください。**
 ブラウザ上のGitHubの画面だけで更新でき、開発環境の用意は不要です。
+
+デザインの仕掛けや注意点は [gachi/HANDOVER.md](./gachi/HANDOVER.md) にあります。
 
 ## 構成
 
@@ -23,13 +24,13 @@
 │   ├── publications.yaml       業績
 │   └── news/                   お知らせ（1記事1ファイル）
 ├── public/                 画像など（favicon・OGP画像・robots.txt）
-├── gachi/                  新デザイン案（文章・写真は content/・public/ を共有）
-├── src/                    サイトの見た目（通常は触りません）
-│   ├── layouts/Base.astro      全ページ共通のヘッダー・フッター
-│   ├── components/             共通部品（見出し帯・News一覧）
-│   ├── pages/                  各ページ＋404・sitemap.xml
-│   ├── styles/global.css       色・文字・余白の設定
-│   └── lib/                    content/ の読み込み・日付整形など
+├── gachi/                  公開中のデザイン（通常は触りません）
+│   ├── src/layouts/Layout.astro    全ページ共通のヘッダー・フッター
+│   ├── src/components/             トップの解析・時間割表・学生アイコンなど
+│   ├── src/pages/                  各ページ＋404・sitemap.xml
+│   ├── src/styles/gachi.css        色・文字・余白の設定
+│   └── src/lib/                    content/ の読み込み・品詞のデータなど
+├── src/                    旧デザイン（2026年9月まで使用。戻すとき用に保管）
 └── .github/workflows/      push すると自動で公開される設定
 ```
 
@@ -37,8 +38,9 @@
 
 ```bash
 npm ci
-npm run dev      # http://localhost:4321
-npm run build    # dist/ に出力
+npm run dev          # 公開中のデザイン  http://localhost:4321
+npm run build        # gachi/dist/ に出力（公開されるのはこれ）
+npm run dev:old      # 旧デザイン（src/）
 ```
 
 Node.js 22以上が必要です。

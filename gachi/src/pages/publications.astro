@@ -21,7 +21,11 @@ const years = [...publicationsByYear].reverse();
 ---
 <Layout title="業績" description="認知言語学・言語データ分析研究室の学生の論文・研究発表です。教員の業績はresearchmapに掲載しています。">
   <PageHead tokens={titles.publications} en="Publications">
-    <p class="phead-lead">学生の論文・研究発表を掲載しています。教員の研究業績は researchmap に掲載しています。</p>
+    <p class="phead-lead">
+      学生の論文・研究発表を掲載しています。教員の研究業績は
+      <a class="lead-link" href={site.professor.links.researchmap} target="_blank" rel="noopener">researchmap<span class="sr-only">（新しいタブで開きます）</span></a>
+      に掲載しています。
+    </p>
   </PageHead>
 
   {studentPublications.length > 0 && (
@@ -93,6 +97,16 @@ const years = [...publicationsByYear].reverse();
 </Layout>
 
 <style>
+  .lead-link {
+    color: var(--noun-ink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: .2em;
+    transition: color .3s;
+  }
+  .lead-link:hover { color: var(--verb-ink); }
+
   .summary { padding-block: clamp(3rem, 6vw, 4.5rem); }
   .summary-grid { display: grid; gap: 2.5rem; align-items: end; }
   @media (min-width: 56rem) { .summary-grid { grid-template-columns: 1fr 1fr; } }

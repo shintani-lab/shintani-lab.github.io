@@ -3,8 +3,9 @@
 // content/join.yaml の seminar.slots に「〇曜△・□限」と書かれていれば表に載ります。
 // 読み取れない行（例：「他曜日に実施」）は、表の下に文章のまま並べます。
 // 1行も読み取れないときは表を描かず、文章の一覧だけを出します（内容が消えないように）。
-interface Props { slots: string[]; tone?: 'light' | 'dark' }
-const { slots, tone = 'light' } = Astro.props;
+// place を渡すと、表の上に「〇〇で実施」と実施場所を出します（content/site.yaml の location.seminar.campus）。
+interface Props { slots: string[]; tone?: 'light' | 'dark'; place?: string }
+const { slots, tone = 'light', place } = Astro.props;
 
 const COLORS = ['noun', 'verb', 'particle', 'aux', 'suffix'];
 const toNum = (s: string) =>
@@ -49,6 +50,12 @@ const blocks = days.map((day) => {
 ---
 {slots.length > 0 && (
   <div class:list={['tt', `tt-${tone}`]}>
+    {place && (
+      <p class="tt-place">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        <span><b>{place}</b>で実施</span>
+      </p>
+    )}
     {onGrid.length > 0 && (
     <div class="tt-grid" style={`--days:${days.length}; --rows:${maxP}`} role="img"
          aria-label={onGrid.map((p) => `${p.label}：${p.time}`).join('、')}>
@@ -92,6 +99,22 @@ const blocks = days.map((day) => {
 <style>
   .tt { --tt-line: var(--line); --tt-text: var(--muted); --tt-cell: #fff; }
   .tt-dark { --tt-line: rgba(255, 255, 255, .1); --tt-text: var(--on-night-muted); --tt-cell: rgba(255, 255, 255, .03); }
+
+  .tt-place {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    margin-bottom: 1.1rem;
+    padding: .35rem .9rem .35rem .7rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--verb) 14%, transparent);
+    color: var(--verb-ink);
+    font-size: .88rem;
+    line-height: 1.5;
+  }
+  .tt-place b { font-weight: 900; }
+  .tt-dark .tt-place { background: rgba(255, 255, 255, .1); color: #fff; }
+  .tt-dark .tt-place svg { color: color-mix(in srgb, var(--verb) 70%, #fff); }
 
   .tt-grid {
     display: grid;

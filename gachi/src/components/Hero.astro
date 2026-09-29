@@ -59,7 +59,7 @@ let idx = 0;
         <div class="parse-note">
           <p>
             キャッチコピーを形態素（意味をもつ最小の単位）に分け、品詞と、文節どうしの係り受けを描いています。
-            <span class="hover-hint">語にカーソルを合わせると、原形や読みが出ます。</span>
+            <span class="hover-hint">語にカーソルを合わせると、品詞タグ付け情報が出ます。</span>
           </p>
           <ul class="parse-legend mono" role="list">
             {legend.map((k) => <li class={`pos-${k}`}><span></span>{POS[k]}</li>)}

@@ -22,6 +22,15 @@ import { titles } from '../lib/lang';
 </Layout>
 
 <script>
+  // 比較期間中に配った https://shintani-lab.github.io/gachi/〜 のリンクで来た人を、
+  // 同じページの新しいURLへ自動で移します（例：/gachi/members/ → /members/）。
+  const base = import.meta.env.BASE_URL;
+  const OLD = '/gachi';
+  const path = location.pathname;
+  if (base === '/' && (path === OLD || path.startsWith(OLD + '/'))) {
+    location.replace((path.slice(OLD.length) || '/') + location.search + location.hash);
+  }
+
   const el = document.querySelector('[data-path]');
   if (el) el.textContent = decodeURIComponent(location.pathname);
 </script>

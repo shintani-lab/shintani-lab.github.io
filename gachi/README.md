@@ -1,11 +1,9 @@
-# 認知言語学・言語データ分析研究室 Webサイト（新デザイン案）
+# 認知言語学・言語データ分析研究室 Webサイト（デザイン）
 
-研究室サイトの新しいデザイン案です。現在のデザインと見比べられるよう、比較用に公開しています。
+いま https://shintani-lab.github.io/ で公開しているデザインです（2026年9月に旧デザインから切り替え）。
 
-- **新デザイン（比較用）** https://shintani-lab.github.io/gachi/ （検索結果には出ません）
-- **現在のデザイン（本番）** https://shintani-lab.github.io/
-- 更新のしかた・新デザインだけの注意点・**本番に切り替える手順** → **[HANDOVER.md](HANDOVER.md)**
-- 文章の更新手順そのもの → 直下の [HANDOVER.md](../HANDOVER.md)（手順は共通です）
+- デザインの仕掛けと注意点・**旧デザインに戻す手順** → **[HANDOVER.md](HANDOVER.md)**
+- 文章の更新手順 → 直下の [HANDOVER.md](../HANDOVER.md)
 
 ## コンセプト
 
@@ -28,20 +26,18 @@
 | 連絡先 | 2つのキャンパスを結んだ図、メールアドレスを「@」に直してコピーするボタン |
 | 404 | 開こうとしたURLを「未知語」として表示 |
 
-## 現在のデザインとの関係
+## 文章・写真との関係
 
-- **文章（`content/`）と写真（`public/`）は共通**です。`gachi/` の中に文章のコピーはありません。
-  `content/` を直すと、両方のデザインに同時に反映されます。
-- ページのURL構成は同じです（`/research/`、`/members/`、`/news/記事名/` など）。
-- `main` に push すると、両方のデザインが一緒に公開されます（`.github/workflows/deploy.yml`）。
-- 新デザインを本番にするときは、`deploy.yml` を書き換えるだけです（[HANDOVER.md](HANDOVER.md) の最後）。
+- **文章（`content/`）と写真（`public/`）は、リポジトリ直下にあります。** `gachi/` の中に文章のコピーはありません。
+  `content/` を直すと、このデザインに反映されます。
+- ページのURL構成は旧デザインと同じです（`/research/`、`/members/`、`/news/記事名/` など）。
+- `main` に push すると、自動で公開されます（`.github/workflows/deploy.yml`）。
 
 ## 手元で見る
 
 ```bash
 npm ci        # リポジトリの直下で、初回だけ
-cd gachi
 npm run dev   # http://localhost:4321 を開く
 ```
 
-追加のインストールはありません（現在のデザインと同じ Astro と js-yaml を使います）。
+追加のインストールはありません（Astro と js-yaml だけを使います）。

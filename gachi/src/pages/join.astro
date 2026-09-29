@@ -42,7 +42,7 @@ const photos = join.photos ?? [];
           {join.seminar.note && <p class="seminar-note"><span class="mk pos-suffix">{join.seminar.note}</span></p>}
         </div>
         <div class="seminar-tt" data-reveal style="--d:120ms">
-          <Timetable slots={join.seminar.slots} />
+          <Timetable slots={join.seminar.slots} place={site.location.seminar.campus} />
         </div>
       </div>
 

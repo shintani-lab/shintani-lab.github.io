@@ -4,9 +4,12 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "dev": "astro dev --root gachi",
+    "build": "astro build --root gachi",
+    "preview": "astro preview --root gachi",
+    "dev:old": "astro dev",
+    "build:old": "astro build",
+    "preview:old": "astro preview"
   },
   "dependencies": {
     "astro": "^7.2.4",
