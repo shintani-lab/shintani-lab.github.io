@@ -33,6 +33,8 @@ jobs:
       #   run: npm run build:old  ／  path: ./dist
       # に書き換えてください（詳しくは gachi/HANDOVER.md）。
       - run: npm run build
+      # 旧デザインを参考用に /old/ へ置きます（不要になったらこの2行を消してください）
+      - run: npm run build:archive
       - uses: actions/upload-pages-artifact@v5
         with:
           path: ./gachi/dist

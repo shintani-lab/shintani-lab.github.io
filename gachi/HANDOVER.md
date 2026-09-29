@@ -211,7 +211,17 @@ slots:
 
 ---
 
-## 旧デザインに戻す場合
+## 旧デザインを見せる・戻す
+
+### 参考用の公開（/old/）
+
+旧デザインは https://shintani-lab.github.io/old/ で見られるようにしています（2026年9月、切り替えの説明用）。
+画面下に「旧デザインです」という案内が出て、検索結果には出ません。
+
+- 仕組みは `scripts/build-old-archive.mjs` です。旧デザインをビルドしてから、リンクを `/old/` 付きに書き換えて置いています。
+- 不要になったら、このファイルと、`package.json` の `build:archive` の行と、`.github/workflows/deploy.yml` の `npm run build:archive` の2行を消してください。
+
+### 旧デザインに戻す場合
 
 `.github/workflows/deploy.yml` の、次の2か所を書き換えてコミットするだけです。
 

@@ -9,7 +9,8 @@
     "preview": "astro preview --root gachi",
     "dev:old": "astro dev",
     "build:old": "astro build",
-    "preview:old": "astro preview"
+    "preview:old": "astro preview",
+    "build:archive": "node scripts/build-old-archive.mjs"
   },
   "dependencies": {
     "astro": "^7.2.4",
