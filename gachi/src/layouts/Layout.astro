@@ -61,7 +61,7 @@ const productionPage = new URL(
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=M+PLUS+1+Code:wght@400..700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=M+PLUS+1+Code:wght@400..700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap"
     />
     <script is:inline>document.documentElement.classList.add('js');</script>
   </head>
@@ -113,8 +113,8 @@ const productionPage = new URL(
             <p class="footer-ja">{site.lab.name_ja}</p>
             <p class="footer-en en" lang="en">{site.lab.name_en}</p>
             <p class="footer-addr">
-              {site.professor.affiliation}　{site.professor.name_ja} {site.professor.title}<br />
-              ゼミ：{site.location.seminar.campus}　教員所属：{site.location.office.campus}
+              <span class="nobr">{site.professor.affiliation}</span>　<span class="nobr">{site.professor.name_ja} {site.professor.title}</span><br />
+              <span class="nobr">ゼミ：{site.location.seminar.campus}</span>　<span class="nobr">教員所属：{site.location.office.campus}</span>
             </p>
           </div>
           <ul class="footer-nav" role="list">
@@ -157,6 +157,9 @@ const productionPage = new URL(
         header.classList.toggle('is-open', open);
         menuBtn.setAttribute('aria-expanded', String(open));
         document.documentElement.classList.toggle('menu-open', open);
+        // メニューを開いている間は、裏にある本文などをキーボードや読み上げで触れないようにします
+        document.querySelectorAll<HTMLElement>('body > .skip, main, footer, .preview')
+          .forEach((el) => { el.inert = open; });
       };
       menuBtn?.addEventListener('click', () => setMenu(!header?.classList.contains('is-open')));
       document.addEventListener('keydown', (e) => {
@@ -269,7 +272,7 @@ const productionPage = new URL(
     transition: background-color .3s, color .3s;
   }
   .is-dark-top .header:not(.is-solid) .nav-cta { background: #fff; color: var(--ink); }
-  .nav-cta:hover, .nav-cta.is-current { background: var(--verb) !important; color: #fff !important; }
+  .nav-cta:hover, .nav-cta.is-current { background: var(--verb-ink) !important; color: #fff !important; }
 
   .menu-btn { display: none; }
 
@@ -386,7 +389,7 @@ const productionPage = new URL(
     white-space: nowrap;
     transition: background-color .3s, color .3s;
   }
-  .preview-link:hover { background: var(--verb); color: #fff; }
+  .preview-link:hover { background: var(--verb-ink); color: #fff; }
   @media (max-width: 47.99rem) {
     .preview { padding: .25rem; }
     .preview-label { display: none; }
@@ -402,7 +405,7 @@ const productionPage = new URL(
     overflow: hidden;
   }
   .footer-big {
-    font-size: clamp(2.2rem, 6.4vw, 5.6rem);
+    font-size: clamp(1.5rem, 6.4vw, 5.6rem);
     font-weight: 900;
     line-height: 1.15;
     letter-spacing: .02em;
@@ -422,9 +425,12 @@ const productionPage = new URL(
   .footer-ja { color: #fff; font-weight: 700; font-size: 1.05rem; letter-spacing: .05em; }
   .footer-en { font-size: .78rem; margin-top: .2rem; }
   .footer-addr { margin-top: 1.25rem; line-height: 1.9; }
+  .footer-ja, .footer-big { word-break: auto-phrase; }
   .footer-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem 1.5rem; align-content: start; }
   .footer-nav a, .footer-bottom a { text-decoration: none; transition: color .3s; }
   .footer-nav a { white-space: nowrap; }
+  /* 長い項目（配属を検討している方へ）は2列分の幅を使います */
+  .footer-nav li:last-child { grid-column: 1 / -1; }
   .footer-bottom a { display: inline-flex; align-items: center; gap: .35rem; }
   .footer-nav a:hover, .footer-bottom a:hover { color: #fff; }
   .footer-legend-title { color: #fff; font-weight: 700; }

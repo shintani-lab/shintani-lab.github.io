@@ -89,7 +89,7 @@ const years = [...publicationsByYear].reverse();
     <div class="container">
       <a class="rmap" href={site.professor.links.researchmap} target="_blank" rel="noopener">
         <span class="mono">Faculty publications</span>
-        <span class="rmap-title">教員の研究業績は researchmap へ</span>
+        <span class="rmap-title">教員の研究業績は <span class="nobr">researchmap へ</span></span>
         <span class="rmap-go"><Arrow kind="out" size={22} /></span>
       </a>
     </div>
@@ -175,7 +175,7 @@ const years = [...publicationsByYear].reverse();
     text-decoration: none;
     transition: background-color .3s;
   }
-  .pub-link:hover { background: var(--c); }
+  .pub-link:hover { background: var(--c-ink); }
 
   .rmap {
     display: grid;

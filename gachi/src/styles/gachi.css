@@ -28,7 +28,8 @@
   --symbol: #8f95a8;
   --unknown: #e5484d;
 
-  /* 品詞の色：白地の小さな文字に使う濃い色（読みやすさの基準を満たす濃さ） */
+  /* 品詞の色：白地の小さな文字に使う濃い色、および白い文字を載せる背景の色
+     （明るい --noun などの上に白い文字を載せると読みにくいため、白文字の背景には必ずこちらを使います） */
   --noun-ink: #2d4be0;
   --verb-ink: #c43519;
   --particle-ink: #0a7a67;
@@ -94,6 +95,19 @@ h1, h2, h3, h4 {
   /* 対応ブラウザ（Chrome・Edge）では、日本語を文節の切れ目で折り返します */
   word-break: auto-phrase;
 }
+/* ---- 文字の折り返し ----
+   段落：行末に1〜2文字だけが残らないよう、ブラウザに折り返し位置を整えさせます。
+   短い題名やカード内の見出し：文節の切れ目で折り返します（「公開しまし／た」のような改行を防ぐ）。
+   どちらも対応していないブラウザでは、普通の折り返しになるだけです。 */
+p, li, dt, dd, figcaption, blockquote { text-wrap: pretty; }
+dt, .statement, .ap-title, .field-name, .stack-text, .theme-text, .stheme-text,
+.ncard-title, .row-title, .pager-title, .next-title, .rmap-title, .cta-text,
+.pub-title, .footer-legend-title, .tt-time, .pipe-arrow, .pipe-detail {
+  word-break: auto-phrase;
+}
+/* 途中で改行させたくないまとまり（「豊洲キャンパス」など） */
+.nobr { white-space: nowrap; }
+
 ::selection { background: color-mix(in srgb, var(--noun) 25%, transparent); }
 
 :focus-visible {
@@ -230,7 +244,7 @@ h1, h2, h3, h4 {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--c);
+  background: var(--c-ink);
   transform: translateY(101%);
   transition: transform .5s var(--ease);
 }

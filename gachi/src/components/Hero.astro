@@ -477,6 +477,7 @@ let idx = 0;
   }
   @keyframes blink { 50% { opacity: 0; } }
   .parse-note { font-size: .85rem; color: var(--on-night-muted); line-height: 1.85; }
+  .hover-hint { display: block; }
   @media (hover: none) { .hover-hint { display: none; } }
   .parse-legend { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: .75rem; font-size: .75rem; }
   .parse-legend li { display: inline-flex; align-items: center; gap: .4rem; }
@@ -519,7 +520,7 @@ let idx = 0;
     flex: none;
     padding: .05rem .55rem;
     border-radius: 4px;
-    background: var(--verb);
+    background: var(--verb-ink);
     color: #fff;
     font-size: .7rem;
     font-weight: 700;

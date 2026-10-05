@@ -137,7 +137,7 @@ const years = [...new Set(news.map((n) => n.date.getFullYear()))].map((y) => ({
     border: 1px solid var(--line);
     transition: background-color .3s, color .3s, border-color .3s;
   }
-  .row:hover .row-go { background: var(--c); border-color: var(--c); color: #fff; }
+  .row:hover .row-go { background: var(--c-ink); border-color: var(--c-ink); color: #fff; }
   @media (max-width: 47.99rem) {
     .row { grid-template-columns: auto 1fr auto; gap: .4rem .75rem; }
     .row-title { grid-column: 1 / 3; }
