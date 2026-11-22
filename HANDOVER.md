@@ -289,7 +289,7 @@ npm run dev
   上書きしてください（ファイル名を変えると表示されなくなります）。
   - `images/` … サイトに出る写真
     - `shintani.jpg` … メンバーページの教員の写真
-    - `party-monja.jpg` / `party-tt.jpg` … Join Us ページの懇親会の写真
+    - `party-monja.jpg` / `party-tt.jpg` / `party-procomm2026.jpg` … Join Us ページの懇親会の写真
   - `favicon.svg` … ブラウザのタブに出る小さなアイコン
   - `apple-touch-icon.png` … スマホのホーム画面に追加したときのアイコン
   - `ogp.png` … SlackやSNSにURLを貼ったときに出るプレビュー画像（1200×630）

@@ -15,6 +15,19 @@ faculty:
   researchmap: https://researchmap.jp/mayushintani
 
 students:
+  # 【提供】2026-11 新谷先生より（Slackでのご依頼）
+  - year: 2026
+    type: 研究発表
+    authors: Haoying Ren and Mayu Shintani
+    title: "Relationships Among English Self-Efficacy, Classroom Anxiety, and International Posture in Engineering Students"
+    venue: The IEEE ProComm Japan 2026 Workshop、2026年11月5日
+    url: ""
+  - year: 2026
+    type: 研究発表
+    authors: Dayu Wu and Mayu Shintani
+    title: "Exploring Chinese–Japanese Code-Switching among Chinese Residents in Japan: A Quantitative Study of Individual and Psychological Factors"
+    venue: The IEEE ProComm Japan 2026 Workshop、2026年11月5日
+    url: ""
   # 【提供】2026-08-25 新谷先生より
   - year: 2025
     type: 査読付き論文
