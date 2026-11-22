@@ -100,7 +100,6 @@ const gradeColor = (i: number) => CYCLE[(i + 1) % CYCLE.length];
             </div>
           ))}
         </div>
-        <p class="note">※ 学生のアイコンは顔写真の代わりに、名前の文字から自動で作った模様です（同じ名前からは、いつも同じ模様ができます）。</p>
       </div>
     </section>
   )}
@@ -114,6 +113,11 @@ const gradeColor = (i: number) => CYCLE[(i + 1) % CYCLE.length];
     .prof-photo { position: sticky; top: calc(var(--header-h) + 2rem); }
   }
   .prof-photo { position: relative; max-width: 26rem; }
+  /* スマホ・タブレットでは写真が画面幅いっぱいの縦長になり、写真だけで1画面を使っていたため小さくしています */
+  @media (max-width: 59.99rem) {
+    .prof { gap: 1.75rem; }
+    .prof-photo { width: min(60%, 16rem); }
+  }
   .prof-photo img {
     width: 100%;
     aspect-ratio: 3 / 4;
@@ -132,7 +136,7 @@ const gradeColor = (i: number) => CYCLE[(i + 1) % CYCLE.length];
   }
   .prof-name {
     margin-top: 1.25rem;
-    font-size: clamp(2.8rem, 7vw, 5.2rem);
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
     font-weight: 900;
     line-height: 1.35;
     letter-spacing: .08em;
@@ -183,13 +187,13 @@ const gradeColor = (i: number) => CYCLE[(i + 1) % CYCLE.length];
 
   /* ---------- 学生 ---------- */
   .total { font-weight: 700; }
-  .total .en { font-size: clamp(3rem, 7vw, 5rem); font-weight: 800; line-height: 1; margin-right: .2rem; }
+  .total .en { font-size: clamp(2.4rem, 4.5vw, 3.4rem); font-weight: 800; line-height: 1; margin-right: .2rem; }
 
   .compo {
     display: flex;
     gap: 4px;
     height: 4.5rem;
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
   .compo-seg {
     position: relative;
@@ -251,5 +255,4 @@ const gradeColor = (i: number) => CYCLE[(i + 1) % CYCLE.length];
   .card:hover :global(.identicon) { transform: rotate(-8deg) scale(1.05); }
   .card-name { font-size: 1.2rem; font-weight: 900; letter-spacing: .1em; color: var(--ink); }
   .card-theme { font-size: .82rem; color: var(--muted); line-height: 1.7; }
-  .note { margin-top: 2rem; font-size: .8rem; color: var(--muted); }
 </style>

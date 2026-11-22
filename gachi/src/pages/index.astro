@@ -142,7 +142,6 @@ const fields = research.fields;
                 </li>
               ))}
             </ul>
-            <p class="crowd-note">※ アイコンは、名前の文字から自動で作った模様です。</p>
           </div>
         )}
       </div>
@@ -224,7 +223,7 @@ const fields = research.fields;
   .statement {
     margin-top: 1.5rem;
     max-width: 58rem;
-    font-size: clamp(1.45rem, 3.2vw, 2.55rem);
+    font-size: clamp(1.3rem, 2.4vw, 1.9rem);
     font-weight: 700;
     line-height: 1.75;
     color: var(--ink);
@@ -249,7 +248,7 @@ const fields = research.fields;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1px;
-    margin-top: clamp(3rem, 6vw, 5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
     background: var(--line);
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -259,7 +258,7 @@ const fields = research.fields;
   .stat { padding: 1.5rem 1.5rem 1.25rem; background: var(--paper); }
   .stat dt { font-size: .85rem; font-weight: 700; color: var(--muted); }
   .stat dd { display: flex; align-items: baseline; gap: .3rem; margin-top: .5rem; }
-  .stat-n { font-size: clamp(2.8rem, 6vw, 4.5rem); font-weight: 800; line-height: 1; color: var(--c-ink); font-variant-numeric: tabular-nums; }
+  .stat-n { font-size: clamp(2.4rem, 4.5vw, 3.4rem); font-weight: 800; line-height: 1; color: var(--c-ink); font-variant-numeric: tabular-nums; }
   .stat-u { font-weight: 700; color: var(--ink); }
 
   /* ---------- 研究のアプローチ ---------- */
@@ -288,7 +287,7 @@ const fields = research.fields;
   .ap:hover { transform: translateY(-6px); box-shadow: 0 24px 48px -20px rgba(12, 15, 29, .3); }
   .ap-num {
     display: block;
-    font-size: clamp(3.2rem, 5vw, 4.2rem);
+    font-size: clamp(2.6rem, 4vw, 3.4rem);
     font-weight: 800;
     line-height: 1;
     /* 「4」などは線が重なった形のため、輪郭の上から背景色で中を塗って重なり線を隠します */
@@ -344,14 +343,13 @@ const fields = research.fields;
   }
 
   /* ---------- 研究テーマ（重なっていくカード） ---------- */
-  .stack { display: grid; gap: 1.5rem; }
+  .stack { display: grid; gap: 1rem; }
   .stack-card {
     position: sticky;
     top: calc(var(--header-h) + 1.25rem + var(--i) * 1.2rem);
     display: grid;
     gap: 1.25rem 2.5rem;
-    min-height: clamp(10rem, 22vh, 13rem);
-    padding: clamp(1.75rem, 4vw, 3rem);
+    padding: clamp(1.25rem, 2.5vw, 1.75rem) clamp(1.5rem, 3vw, 2.25rem);
     border-radius: var(--radius-lg);
     background: color-mix(in srgb, var(--c) 9%, var(--paper));
     border: 1px solid color-mix(in srgb, var(--c) 22%, transparent);
@@ -362,13 +360,13 @@ const fields = research.fields;
     .stack-card { grid-template-columns: auto 1fr; align-items: center; }
   }
   .stack-num {
-    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    font-size: clamp(2.4rem, 4.5vw, 3.6rem);
     font-weight: 800;
     line-height: .9;
     color: var(--c-ink);
   }
   .stack-text {
-    font-size: clamp(1.4rem, 3vw, 2.25rem);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
     font-weight: 900;
     line-height: 1.5;
     color: var(--ink);
@@ -419,7 +417,6 @@ const fields = research.fields;
   .crowd-list li { display: grid; justify-items: center; gap: .5rem; font-size: .82rem; font-weight: 500; text-align: center; }
   .crowd-list li :global(svg) { transition: transform .4s var(--ease); }
   .crowd-list li:hover :global(svg) { transform: translateY(-4px) rotate(-4deg); }
-  .crowd-note { margin-top: 1.25rem; font-size: .75rem; color: var(--on-night-muted); }
 
   /* ---------- お知らせ ---------- */
   .ncards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }

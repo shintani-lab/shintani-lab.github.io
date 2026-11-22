@@ -417,14 +417,14 @@ const words = [...new Set(pool)].slice(0, 24);
 
   .pipe-steps { position: relative; z-index: 1; }
   .pipe-step {
-    min-height: 62svh;
+    min-height: 48svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding-block: 2rem;
   }
-  .pipe-step:first-child { min-height: 40svh; justify-content: flex-start; }
-  .pipe-step:last-child { min-height: 50svh; }
+  .pipe-step:first-child { min-height: 30svh; justify-content: flex-start; }
+  .pipe-step:last-child { min-height: 40svh; }
   .pipe-card {
     padding: clamp(1.5rem, 3vw, 2.25rem);
     border-radius: var(--radius);
@@ -471,9 +471,9 @@ const words = [...new Set(pool)].slice(0, 24);
     }
     .pipe-screen { height: calc(100svh - var(--header-h) - 10vh); max-height: 44rem; }
     .pipe-steps { order: 1; }
-    .pipe-step { min-height: 78svh; }
-    .pipe-step:first-child { min-height: 70svh; justify-content: center; }
-    .pipe-step:last-child { min-height: 70svh; }
+    .pipe-step { min-height: 55svh; }
+    .pipe-step:first-child { min-height: 50svh; justify-content: center; }
+    .pipe-step:last-child { min-height: 50svh; }
   }
   @media (prefers-reduced-motion: reduce) {
     .pipe-card { transition: none; }

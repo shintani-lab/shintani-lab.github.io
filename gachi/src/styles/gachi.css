@@ -149,13 +149,13 @@ dt, .statement, .ap-title, .field-name, .stack-text, .theme-text, .stheme-text,
 
 /* ---------- セクション ---------- */
 
-.section { padding-block: clamp(4.5rem, 10vw, 8rem); }
+.section { padding-block: clamp(3rem, 6vw, 5rem); }
 .section-alt { background: var(--paper-2); }
 .section-night { background: var(--night); color: var(--on-night); }
 .section-night h2, .section-night h3 { color: #fff; }
 
 /* セクション見出し */
-.shead { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.shead { margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
 .shead-en {
   font-family: var(--font-mono);
   font-size: .8rem;
@@ -166,7 +166,7 @@ dt, .statement, .ap-title, .field-name, .stack-text, .theme-text, .stheme-text,
 .shead-en b { color: var(--noun-ink); font-weight: 700; }
 .shead-ja {
   margin-top: .5rem;
-  font-size: clamp(1.75rem, 4.4vw, 3.4rem);
+  font-size: clamp(1.5rem, 3.2vw, 2.5rem);
   font-weight: 900;
   letter-spacing: .02em;
   line-height: 1.25;
@@ -180,7 +180,7 @@ dt, .statement, .ap-title, .field-name, .stack-text, .theme-text, .stheme-text,
   align-items: flex-end;
   justify-content: space-between;
   gap: 1.5rem;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
 }
 .shead-row > .shead { margin-bottom: 0; }
 
@@ -223,7 +223,7 @@ dt, .statement, .ap-title, .field-name, .stack-text, .theme-text, .stheme-text,
 .more:hover { gap: .9rem; color: var(--noun-ink); }
 
 /* ---------- 次のページへのカード ---------- */
-.next { padding-block: clamp(3rem, 6vw, 5rem); }
+.next { padding-block: clamp(2rem, 4vw, 3rem); }
 .next-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
 .next-card {
   display: grid;

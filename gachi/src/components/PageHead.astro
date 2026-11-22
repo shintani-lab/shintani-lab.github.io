@@ -37,7 +37,7 @@ const chars = [...plain].length;
   .phead {
     position: relative;
     overflow: hidden;
-    padding: calc(var(--header-h) + clamp(3rem, 8vw, 6rem)) 0 clamp(3rem, 6vw, 4.5rem);
+    padding: calc(var(--header-h) + clamp(2rem, 4vw, 3rem)) 0 clamp(2rem, 4vw, 3rem);
     border-bottom: 1px solid var(--line);
   }
   /* 方眼紙のような薄い罫線 */
@@ -61,12 +61,12 @@ const chars = [...plain].length;
   }
   .phead-count::before { content: "— "; }
   .phead-title {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
     gap: .9rem .12em;
-    font-size: clamp(2.5rem, min(8vw, calc(min(100vw - 2 * var(--gutter), var(--container)) / (var(--n) + 1.8))), 6.4rem);
+    font-size: clamp(2.1rem, min(5.5vw, calc(min(100vw - 2 * var(--gutter), var(--container)) / (var(--n) + 1.8))), 4.5rem);
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: .01em;
@@ -106,7 +106,7 @@ const chars = [...plain].length;
     .ptok::before, .ptok-p { animation: none; transform: none; opacity: 1; }
   }
   .phead :global(.phead-lead) {
-    margin-top: clamp(2rem, 4vw, 3rem);
+    margin-top: clamp(1.25rem, 2.5vw, 2rem);
     max-width: 46rem;
     font-size: clamp(1.02rem, 1.5vw, 1.15rem);
     line-height: 2;
